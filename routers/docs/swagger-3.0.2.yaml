@@ -1,3 +1,4 @@
+---
 openapi: '3.0.2'
 info:
   title: Go Simple API
@@ -8,8 +9,7 @@ servers:
     variables:
       "apiVersion":
         default: v1
-        enum:
-          - "v1"
+        enum: [ "v1" ]
 
 tags:
   - name: User
@@ -21,8 +21,7 @@ paths:
   "/users":
     get:
       description: Return all users from the database
-      tags:
-        - "User"
+      tags: [ "User" ]
       responses:
         "200":
           description: List of UserModel
@@ -30,46 +29,39 @@ paths:
             "application/json":
               schema:
                 type: array
-                items:
-                  $ref: "#/components/schemas/UserModel"
+                items: { $ref: "#/components/schemas/UserModel" }
 
   "/user/{id}":
     get:
       description: Return a single user from the database by their ID
-      tags:
-        - "User"
+      tags: [ "User" ]
       parameters:
         - name: id
           in: path
           required: true
-          schema:
-            $ref: "#/components/schemas/UserId"
+          schema: { $ref: "#/components/schemas/UserId" }
       responses:
         "200":
           description: The User information
           content:
             "application/json":
-              schema:
-                $ref: "#/components/schemas/IdentifiedUser"
+              schema: { $ref: "#/components/schemas/IdentifiedUser" }
         "404":
           description: The User was not found in the database
         "400":
           description: The query parameter "id" was incorrect
           content:
             "application/json":
-              schema:
-                $ref: "#/components/schemas/ErrorMessage"
+              schema: { $ref: "#/components/schemas/ErrorMessage" }
 
     patch:
       description: Update some user information
-      tags:
-        - "User"
+      tags: [ "User" ]
       parameters:
         - name: id
           in: path
           required: true
-          schema:
-            $ref: "#/components/schemas/UserId"
+          schema: { $ref: "#/components/schemas/UserId" }
       requestBody:
         required: true
         content:
@@ -84,19 +76,16 @@ paths:
           description: User updated successfully
           content:
             "application/json":
-              schema:
-                $ref: "#/components/schemas/IdentifiedUser"
+              schema: { $ref: "#/components/schemas/IdentifiedUser" }
 
     delete:
       description: Removes an user from the database
-      tags:
-        - "User"
+      tags: [ "User" ]
       parameters:
         - name: id
           in: path
           required: true
-          schema:
-            $ref: "#/components/schemas/UserId"
+          schema: { $ref: "#/components/schemas/UserId" }
       requestBody:
         required: true
         content:
@@ -114,21 +103,18 @@ paths:
   "/user":
     post:
       description: Add a new User to the database
-      tags:
-        - "User"
+      tags: [ "User" ]
       requestBody:
         required: true
         content:
           "application/x-www-form-urlencoded":
-            schema:
-              $ref: "#/components/schemas/UserWithPassword"
+            schema: { $ref: "#/components/schemas/UserWithPassword" }
       responses:
         "201":
           description: The brand new User with their ID
           content:
             "application/json":
-              schema:
-                $ref: "#/components/schemas/IdentifiedUser"
+              schema: { $ref: "#/components/schemas/IdentifiedUser" }
           headers:
             "Location":
               schema:
@@ -138,20 +124,17 @@ paths:
           description: Incorrect request body
           content:
             "application/json":
-              schema:
-                $ref: "#/components/schemas/ErrorMessage"
+              schema: { $ref: "#/components/schemas/ErrorMessage" }
 
   "/user/{id}/password":
     patch:
       description: Change user password
-      tags:
-        - "User"
+      tags: [ "User" ]
       parameters:
         - name: id
           in: path
           required: true
-          schema:
-            $ref: "#/components/schemas/UserId"
+          schema: { $ref: "#/components/schemas/UserId" }
       requestBody:
         required: true
         content:
