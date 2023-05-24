@@ -5,6 +5,8 @@ import (
 	"github.com/d1360-64rc14/simple-api/repositories"
 )
 
+var _ UserService = (*DefaultUserService)(nil)
+
 type DefaultUserService struct {
 	repo repositories.UserRepository
 }

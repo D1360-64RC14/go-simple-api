@@ -8,6 +8,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var _ UserRepository = (*DefaultUserRepository)(nil)
+
 type DefaultUserRepository struct {
 	db *sql.DB
 }

@@ -4,9 +4,12 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/d1360-64rc14/simple-api/routers"
 	"github.com/d1360-64rc14/simple-api/services"
 	"github.com/gin-gonic/gin"
 )
+
+var _ routers.UserController = (*UserController)(nil)
 
 type UserController struct {
 	service services.UserService
