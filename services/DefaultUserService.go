@@ -9,7 +9,7 @@ type DefaultUserService struct {
 	repo repositories.UserRepository
 }
 
-func NewUserService(userRepository repositories.UserRepository) UserService {
+func NewDefaultUserService(userRepository repositories.UserRepository) UserService {
 	return &DefaultUserService{
 		repo: userRepository,
 	}

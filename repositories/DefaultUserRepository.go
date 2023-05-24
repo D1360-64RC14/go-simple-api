@@ -12,7 +12,7 @@ type DefaultUserRepository struct {
 	db *sql.DB
 }
 
-func NewUserRepository(database *sql.DB) (UserRepository, error) {
+func NewDefaultUserRepository(database *sql.DB) (UserRepository, error) {
 	repo := &DefaultUserRepository{
 		db: database,
 	}

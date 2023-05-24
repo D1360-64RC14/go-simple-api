@@ -18,11 +18,11 @@ func main() {
 	db, err := sql.Open("ramsql", "database")
 	fatalErr(err)
 
-	userRepo, err := repositories.NewUserRepository(db)
+	userRepo, err := repositories.NewDefaultUserRepository(db)
 	fatalErr(err)
 
-	userService := services.NewUserService(userRepo)
-	userController := v1.NewUserController(userService)
+	userService := services.NewDefaultUserService(userRepo)
+	userController := v1.NewDefaultUserController(userService)
 	routers.NewRouter("/api/v1", engine, userController)
 
 	engine.Run("localhost:1360")
