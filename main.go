@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/proullon/ramsql/driver" // Needed to ramsql work
 
+	"github.com/d1360-64rc14/simple-api/middlewares"
 	"github.com/d1360-64rc14/simple-api/repositories"
 	"github.com/d1360-64rc14/simple-api/routers"
 	v1 "github.com/d1360-64rc14/simple-api/routers/v1"
@@ -15,6 +16,10 @@ import (
 
 func main() {
 	engine := gin.Default()
+
+	engine.Static("/api/docs", "routers/docs")
+	engine.Use(middlewares.CORS)
+
 	db, err := sql.Open("ramsql", "database")
 	fatalErr(err)
 
