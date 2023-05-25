@@ -3,20 +3,21 @@ package routers
 import (
 	"net/http"
 
+	"github.com/d1360-64rc14/simple-api/interfaces"
 	"github.com/d1360-64rc14/simple-api/middlewares"
 	"github.com/gin-gonic/gin"
 )
 
 // DefaultRouter implements Router
-var _ Router = (*DefaultRouter)(nil)
+var _ interfaces.Router = (*DefaultRouter)(nil)
 
 type DefaultRouter struct {
 	endpointPrefix string
 	engine         *gin.Engine
-	userController UserController
+	userController interfaces.UserController
 }
 
-func NewDefaultRouter(endpointPrefix string, userController UserController) *DefaultRouter {
+func NewDefaultRouter(endpointPrefix string, userController interfaces.UserController) interfaces.Router {
 	router := &DefaultRouter{
 		endpointPrefix: endpointPrefix,
 		engine:         gin.Default(),

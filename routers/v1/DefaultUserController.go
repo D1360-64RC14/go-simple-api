@@ -4,19 +4,18 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/d1360-64rc14/simple-api/routers"
-	"github.com/d1360-64rc14/simple-api/services"
+	"github.com/d1360-64rc14/simple-api/interfaces"
 	"github.com/gin-gonic/gin"
 )
 
 // DefaultUserController implements UserController
-var _ routers.UserController = (*DefaultUserController)(nil)
+var _ interfaces.UserController = (*DefaultUserController)(nil)
 
 type DefaultUserController struct {
-	service services.UserService
+	service interfaces.UserService
 }
 
-func NewDefaultUserController(userService services.UserService) *DefaultUserController {
+func NewDefaultUserController(userService interfaces.UserService) *DefaultUserController {
 	return &DefaultUserController{
 		service: userService,
 	}

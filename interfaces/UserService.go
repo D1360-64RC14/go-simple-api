@@ -1,9 +1,8 @@
-package repositories
+package interfaces
 
 import "github.com/d1360-64rc14/simple-api/dtos"
 
-type UserRepository interface {
-	Close() error
+type UserService interface {
 	CreateUser(username, email, password string) (*dtos.IdentifiedUser, error)
 	SelectUserFromId(id int) (*dtos.IdentifiedUser, error)
 	SelectUserHashFromId(id int) (string, error)

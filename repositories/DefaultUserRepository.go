@@ -4,18 +4,19 @@ import (
 	"database/sql"
 
 	"github.com/d1360-64rc14/simple-api/dtos"
+	"github.com/d1360-64rc14/simple-api/interfaces"
 	"github.com/d1360-64rc14/simple-api/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
 // DefaultUserRepository implements UserRepository
-var _ UserRepository = (*DefaultUserRepository)(nil)
+var _ interfaces.UserRepository = (*DefaultUserRepository)(nil)
 
 type DefaultUserRepository struct {
 	db *sql.DB
 }
 
-func NewDefaultUserRepository(database *sql.DB) (UserRepository, error) {
+func NewDefaultUserRepository(database *sql.DB) (interfaces.UserRepository, error) {
 	repo := &DefaultUserRepository{
 		db: database,
 	}

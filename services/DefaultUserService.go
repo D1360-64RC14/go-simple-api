@@ -2,17 +2,17 @@ package services
 
 import (
 	"github.com/d1360-64rc14/simple-api/dtos"
-	"github.com/d1360-64rc14/simple-api/repositories"
+	"github.com/d1360-64rc14/simple-api/interfaces"
 )
 
 // DefaultUserService implements UserService
-var _ UserService = (*DefaultUserService)(nil)
+var _ interfaces.UserService = (*DefaultUserService)(nil)
 
 type DefaultUserService struct {
-	repo repositories.UserRepository
+	repo interfaces.UserRepository
 }
 
-func NewDefaultUserService(userRepository repositories.UserRepository) UserService {
+func NewDefaultUserService(userRepository interfaces.UserRepository) interfaces.UserService {
 	return &DefaultUserService{
 		repo: userRepository,
 	}
