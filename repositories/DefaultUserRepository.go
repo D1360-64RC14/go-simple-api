@@ -8,6 +8,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// DefaultUserRepository implements UserRepository
 var _ UserRepository = (*DefaultUserRepository)(nil)
 
 type DefaultUserRepository struct {

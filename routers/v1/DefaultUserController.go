@@ -9,19 +9,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var _ routers.UserController = (*UserController)(nil)
+// DefaultUserController implements UserController
+var _ routers.UserController = (*DefaultUserController)(nil)
 
-type UserController struct {
+type DefaultUserController struct {
 	service services.UserService
 }
 
-func NewDefaultUserController(userService services.UserService) *UserController {
-	return &UserController{
+func NewDefaultUserController(userService services.UserService) *DefaultUserController {
+	return &DefaultUserController{
 		service: userService,
 	}
 }
 
-func (c UserController) GetAll(ctx *gin.Context) {
+func (c DefaultUserController) GetAll(ctx *gin.Context) {
 	allUsers, err := c.service.SelectAllUsers()
 	if err != nil {
 		ctx.String(http.StatusBadRequest, err.Error())
@@ -31,7 +32,7 @@ func (c UserController) GetAll(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, allUsers)
 }
 
-func (c UserController) Get(ctx *gin.Context) {
+func (c DefaultUserController) Get(ctx *gin.Context) {
 	queryIdString, _ := ctx.GetQuery("id")
 	queryId, _ := strconv.ParseInt(queryIdString, 10, 32)
 
@@ -44,7 +45,7 @@ func (c UserController) Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, user)
 }
 
-func (c UserController) Create(ctx *gin.Context) {
+func (c DefaultUserController) Create(ctx *gin.Context) {
 	username := ctx.PostForm("username")
 	email := ctx.PostForm("email")
 	password := ctx.PostForm("password")
@@ -58,10 +59,10 @@ func (c UserController) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, user)
 }
 
-func (c UserController) Update(ctx *gin.Context) {
+func (c DefaultUserController) Update(ctx *gin.Context) {
 
 }
 
-func (c UserController) Delete(ctx *gin.Context) {
+func (c DefaultUserController) Delete(ctx *gin.Context) {
 
 }
