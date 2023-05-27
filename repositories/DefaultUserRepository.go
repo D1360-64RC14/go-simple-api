@@ -40,7 +40,7 @@ func (r DefaultUserRepository) createUserTableIfNotExist() error {
 	}
 	defer tx.Commit()
 
-	tx.Exec(`
+	_, err = tx.Exec(`
 		CREATE TABLE IF NOT EXISTS users(
 			id       INTEGER      NOT NULL PRIMARY KEY AUTO_INCREMENT,
 			username VARCHAR(50)  NOT NULL,
@@ -48,10 +48,21 @@ func (r DefaultUserRepository) createUserTableIfNotExist() error {
 			hash     CHAR(72)     NOT NULL
 		);
 	`)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
 
+// CreateUser adds a new user to the database, returning an identified user.
+//
+// Errors can be caused by:
+// transaction not beeing started;
+// transaction not beeing commited;
+// password having more than 72 characters;
+// query not beeing sucessfully executed;
+// user just created not beeing found.
 func (r DefaultUserRepository) CreateUser(username, email, password string) (*dtos.IdentifiedUser, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
@@ -84,7 +95,10 @@ func (r DefaultUserRepository) CreateUser(username, email, password string) (*dt
 	`, email, username, string(hash))
 
 	var id int
-	row.Scan(&id)
+	err = row.Scan(&id)
+	if err != nil {
+		return nil, err
+	}
 
 	return &dtos.IdentifiedUser{
 		ID: id,
@@ -95,6 +109,10 @@ func (r DefaultUserRepository) CreateUser(username, email, password string) (*dt
 	}, nil
 }
 
+// SelectUserFromId returns the user with their id.
+//
+// Errors can be caused by:
+// id not beeing found.
 func (r DefaultUserRepository) SelectUserFromId(id int) (*dtos.IdentifiedUser, error) {
 	row := r.db.QueryRow(`
 		SELECT
@@ -117,6 +135,10 @@ func (r DefaultUserRepository) SelectUserFromId(id int) (*dtos.IdentifiedUser, e
 	return user, nil
 }
 
+// SelectUserHashFromId returns the user password hash from database.
+//
+// Errors can be caused by:
+// id not beeing found.
 func (r DefaultUserRepository) SelectUserHashFromId(id int) (string, error) {
 	row := r.db.QueryRow(`
 		SELECT
@@ -137,6 +159,10 @@ func (r DefaultUserRepository) SelectUserHashFromId(id int) (string, error) {
 	return hash, nil
 }
 
+// SelectCompleteUserFromId reutrns all user info from database.
+//
+// Errors can be caused by:
+// id not beeing found.
 func (r DefaultUserRepository) SelectCompleteUserFromId(id int) (*dtos.IdentifiedUserWithHash, error) {
 	row := r.db.QueryRow(`
 		SELECT
@@ -160,6 +186,11 @@ func (r DefaultUserRepository) SelectCompleteUserFromId(id int) (*dtos.Identifie
 	return user, nil
 }
 
+// SelectAllUsers returns a list of all users from database.
+//
+// Errors can be caused by:
+// query not beeing successfully executed;
+// row beeing read wrongly.
 func (r DefaultUserRepository) SelectAllUsers() ([]*dtos.IdentifiedUser, error) {
 	rows, err := r.db.Query(`
 		SELECT
@@ -172,6 +203,7 @@ func (r DefaultUserRepository) SelectAllUsers() ([]*dtos.IdentifiedUser, error) 
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
 	users := make([]*dtos.IdentifiedUser, 0)
 
