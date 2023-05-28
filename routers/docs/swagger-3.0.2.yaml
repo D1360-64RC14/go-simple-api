@@ -24,7 +24,7 @@ paths:
       tags: [ "User" ]
       responses:
         "200":
-          description: List of UserModel
+          description: List of users
           content:
             "application/json":
               schema:
@@ -32,40 +32,35 @@ paths:
                 items: { $ref: "#/components/schemas/UserModel" }
 
   "/user/{id}":
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { $ref: "#/components/schemas/UserId" }
     get:
-      description: Return a single user from the database by their ID
+      description: A single user from the database by their ID
       tags: [ "User" ]
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema: { $ref: "#/components/schemas/UserId" }
       responses:
         "200":
-          description: The User information
+          description: User information
           content:
             "application/json":
               schema: { $ref: "#/components/schemas/IdentifiedUser" }
         "404":
-          description: The User was not found in the database
+          description: User ID was not found in the database
         "400":
-          description: The query parameter "id" was incorrect
+          description: Incorrent type for path's parameter "id"
           content:
             "application/json":
               schema: { $ref: "#/components/schemas/ErrorMessage" }
 
     patch:
-      description: Update some user information
+      description: Update user information
       tags: [ "User" ]
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema: { $ref: "#/components/schemas/UserId" }
       requestBody:
         required: true
         content:
-          "application/x-www-form-urlencoded":
+          "application/json":
             schema:
               type: object
               properties:
@@ -73,23 +68,20 @@ paths:
                   type: string
       responses:
         "200":
-          description: User updated successfully
+          description: User was successfully updated
           content:
             "application/json":
               schema: { $ref: "#/components/schemas/IdentifiedUser" }
+        "404":
+          description: User ID was not found in the database
 
     delete:
       description: Removes an user from the database
       tags: [ "User" ]
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema: { $ref: "#/components/schemas/UserId" }
       requestBody:
         required: true
         content:
-          "application/x-www-form-urlencoded":
+          "application/json":
             schema:
               type: object
               properties:
@@ -99,6 +91,8 @@ paths:
       responses:
         "204":
           description: User was successfully removed
+        "404":
+          description: User ID was not found in the database
 
   "/user":
     post:
@@ -107,7 +101,7 @@ paths:
       requestBody:
         required: true
         content:
-          "application/x-www-form-urlencoded":
+          "application/json":
             schema: { $ref: "#/components/schemas/UserWithPassword" }
       responses:
         "201":
@@ -121,24 +115,29 @@ paths:
                 type: string
                 example: http://localhost:1360/api/v1/user/5
         "400":
-          description: Incorrect request body
+          description: Incorrect body data
+          content:
+            "application/json":
+              schema: { $ref: "#/components/schemas/ErrorMessage" }
+        "409":
+          description: Email address already exist
           content:
             "application/json":
               schema: { $ref: "#/components/schemas/ErrorMessage" }
 
   "/user/{id}/password":
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { $ref: "#/components/schemas/UserId" }
     patch:
       description: Change user password
       tags: [ "User" ]
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema: { $ref: "#/components/schemas/UserId" }
       requestBody:
         required: true
         content:
-          "application/x-www-form-urlencoded":
+          "application/json":
             schema:
               type: object
               properties:
@@ -156,6 +155,8 @@ paths:
           description: Password was changed successfully
         "401":
           description: The last password was incorrect
+        "404":
+          description: User ID was not found in the database
 
 components:
   schemas:
@@ -188,6 +189,8 @@ components:
         "password":
           type: string
           format: password
+          maxLength: 72
+          minLength: 8
       required:
         - "username"
         - "email"
