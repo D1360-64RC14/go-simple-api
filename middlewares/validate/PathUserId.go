@@ -9,11 +9,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func PathId(ctx *gin.Context) {
+func PathUserId(ctx *gin.Context) {
 	idString := ctx.Param("id")
 	id, err := strconv.ParseInt(idString, 10, 32)
 	if err == nil {
-		ctx.Set("id", id)
+		ctx.Set("id", int(id))
 		ctx.Next()
 		return
 	}
