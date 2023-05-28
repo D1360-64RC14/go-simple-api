@@ -1,8 +1,12 @@
 package services
 
 import (
+	"net/http"
+
 	"github.com/d1360-64rc14/simple-api/dtos"
 	"github.com/d1360-64rc14/simple-api/interfaces"
+	"github.com/d1360-64rc14/simple-api/utils"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // DefaultUserService implements UserService
@@ -18,22 +22,32 @@ func NewDefaultUserService(userRepository interfaces.UserRepository) interfaces.
 	}
 }
 
-func (s DefaultUserService) CreateUser(username, email, password string) (*dtos.IdentifiedUser, error) {
-	return s.repo.CreateUser(username, email, password)
+func (s DefaultUserService) CreateUser(user dtos.UserWithPassword) (*dtos.IdentifiedUser, *utils.ErrorCode) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), 12)
+	if err != nil {
+		return nil, utils.NewErrorCode(http.StatusBadRequest, err)
+	}
+
+	userHash := &dtos.UserWithHash{
+		UserModel: user.UserModel,
+		Hash:      string(hash),
+	}
+
+	return s.repo.CreateUser(userHash)
 }
 
-func (s DefaultUserService) SelectUserFromId(id int) (*dtos.IdentifiedUser, error) {
+func (s DefaultUserService) SelectUserFromId(id int) (*dtos.IdentifiedUser, *utils.ErrorCode) {
 	return s.repo.SelectUserFromId(id)
 }
 
-func (s DefaultUserService) SelectUserHashFromId(id int) (string, error) {
+func (s DefaultUserService) SelectUserHashFromId(id int) (string, *utils.ErrorCode) {
 	return s.repo.SelectUserHashFromId(id)
 }
 
-func (s DefaultUserService) SelectCompleteUserFromId(id int) (*dtos.IdentifiedUserWithHash, error) {
+func (s DefaultUserService) SelectCompleteUserFromId(id int) (*dtos.IdentifiedUserWithHash, *utils.ErrorCode) {
 	return s.repo.SelectCompleteUserFromId(id)
 }
 
-func (s DefaultUserService) SelectAllUsers() ([]*dtos.IdentifiedUser, error) {
+func (s DefaultUserService) SelectAllUsers() ([]*dtos.IdentifiedUser, *utils.ErrorCode) {
 	return s.repo.SelectAllUsers()
 }

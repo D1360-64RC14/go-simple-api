@@ -20,7 +20,7 @@ func main() {
 	fatalErr(err)
 
 	userService := services.NewDefaultUserService(userRepo)
-	userController := v1.NewDefaultUserController(userService)
+	userController := v1.NewDefaultUserController(userService, userRepo)
 
 	router := routers.NewDefaultRouter("/api/v1", userController)
 	router.Engine().Run("localhost:1360")

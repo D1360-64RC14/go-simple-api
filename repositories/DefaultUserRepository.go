@@ -2,11 +2,11 @@ package repositories
 
 import (
 	"database/sql"
+	"net/http"
 
 	"github.com/d1360-64rc14/simple-api/dtos"
 	"github.com/d1360-64rc14/simple-api/interfaces"
-	"github.com/d1360-64rc14/simple-api/models"
-	"golang.org/x/crypto/bcrypt"
+	"github.com/d1360-64rc14/simple-api/utils"
 )
 
 // DefaultUserRepository implements UserRepository
@@ -60,27 +60,21 @@ func (r DefaultUserRepository) createUserTableIfNotExist() error {
 // Errors can be caused by:
 // transaction not beeing started;
 // transaction not beeing commited;
-// password having more than 72 characters;
 // query not beeing sucessfully executed;
 // user just created not beeing found.
-func (r DefaultUserRepository) CreateUser(username, email, password string) (*dtos.IdentifiedUser, error) {
+func (r DefaultUserRepository) CreateUser(user *dtos.UserWithHash) (*dtos.IdentifiedUser, *utils.ErrorCode) {
 	tx, err := r.db.Begin()
 	if err != nil {
-		return nil, err
+		return nil, utils.NewErrorCode(http.StatusInternalServerError, err)
 	}
 	defer tx.Commit()
-
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), 12)
-	if err != nil {
-		return nil, err
-	}
 
 	_, err = tx.Exec(`
 		INSERT INTO users(username, email, hash)
 		VALUES (?, ?, ?);
-	`, username, email, string(hash))
+	`, user.UserName, user.Email, user.Hash)
 	if err != nil {
-		return nil, err
+		return nil, utils.NewErrorCodeString(http.StatusConflict, "Email address already exist")
 	}
 
 	row := tx.QueryRow(`
@@ -89,23 +83,20 @@ func (r DefaultUserRepository) CreateUser(username, email, password string) (*dt
 		FROM
 			users
 		WHERE
-			email = ? AND
 			username = ? AND
+			email = ? AND
 			hash = ?;
-	`, email, username, string(hash))
+	`, user.UserName, user.Email, user.Hash)
 
 	var id int
 	err = row.Scan(&id)
 	if err != nil {
-		return nil, err
+		return nil, utils.NewErrorCode(http.StatusInternalServerError, err)
 	}
 
 	return &dtos.IdentifiedUser{
-		ID: id,
-		UserModel: models.UserModel{
-			UserName: username,
-			Email:    email,
-		},
+		ID:        id,
+		UserModel: user.UserModel,
 	}, nil
 }
 
@@ -113,7 +104,7 @@ func (r DefaultUserRepository) CreateUser(username, email, password string) (*dt
 //
 // Errors can be caused by:
 // id not beeing found.
-func (r DefaultUserRepository) SelectUserFromId(id int) (*dtos.IdentifiedUser, error) {
+func (r DefaultUserRepository) SelectUserFromId(id int) (*dtos.IdentifiedUser, *utils.ErrorCode) {
 	row := r.db.QueryRow(`
 		SELECT
 			id,
@@ -125,11 +116,15 @@ func (r DefaultUserRepository) SelectUserFromId(id int) (*dtos.IdentifiedUser, e
 			id = ?;
 	`, id)
 
+	if row.Err() != nil {
+		return nil, utils.NewErrorCode(http.StatusInternalServerError, row.Err())
+	}
+
 	user := new(dtos.IdentifiedUser)
 
 	err := row.Scan(&user.ID, &user.UserName, &user.Email)
 	if err != nil {
-		return nil, err
+		return nil, utils.NewErrorCode(http.StatusNotFound, err)
 	}
 
 	return user, nil
@@ -139,7 +134,7 @@ func (r DefaultUserRepository) SelectUserFromId(id int) (*dtos.IdentifiedUser, e
 //
 // Errors can be caused by:
 // id not beeing found.
-func (r DefaultUserRepository) SelectUserHashFromId(id int) (string, error) {
+func (r DefaultUserRepository) SelectUserHashFromId(id int) (string, *utils.ErrorCode) {
 	row := r.db.QueryRow(`
 		SELECT
 			hash,
@@ -149,11 +144,15 @@ func (r DefaultUserRepository) SelectUserHashFromId(id int) (string, error) {
 			id = ?;
 	`, id)
 
+	if row.Err() != nil {
+		return "", utils.NewErrorCode(http.StatusInternalServerError, row.Err())
+	}
+
 	var hash string
 
 	err := row.Scan(&hash)
 	if err != nil {
-		return "", err
+		return "", utils.NewErrorCode(http.StatusNotFound, err)
 	}
 
 	return hash, nil
@@ -163,7 +162,7 @@ func (r DefaultUserRepository) SelectUserHashFromId(id int) (string, error) {
 //
 // Errors can be caused by:
 // id not beeing found.
-func (r DefaultUserRepository) SelectCompleteUserFromId(id int) (*dtos.IdentifiedUserWithHash, error) {
+func (r DefaultUserRepository) SelectCompleteUserFromId(id int) (*dtos.IdentifiedUserWithHash, *utils.ErrorCode) {
 	row := r.db.QueryRow(`
 		SELECT
 			id,
@@ -176,11 +175,15 @@ func (r DefaultUserRepository) SelectCompleteUserFromId(id int) (*dtos.Identifie
 			id = ?;
 	`, id)
 
+	if row.Err() != nil {
+		return nil, utils.NewErrorCode(http.StatusInternalServerError, row.Err())
+	}
+
 	user := new(dtos.IdentifiedUserWithHash)
 
 	err := row.Scan(&user.ID, &user.UserName, &user.Email, &user.Hash)
 	if err != nil {
-		return nil, err
+		return nil, utils.NewErrorCode(http.StatusNotFound, err)
 	}
 
 	return user, nil
@@ -191,28 +194,45 @@ func (r DefaultUserRepository) SelectCompleteUserFromId(id int) (*dtos.Identifie
 // Errors can be caused by:
 // query not beeing successfully executed;
 // row beeing read wrongly.
-func (r DefaultUserRepository) SelectAllUsers() ([]*dtos.IdentifiedUser, error) {
+func (r DefaultUserRepository) SelectAllUsers() ([]*dtos.IdentifiedUser, *utils.ErrorCode) {
+	row := r.db.QueryRow(`
+		SELECT
+			count(id)
+		FROM users;
+	`)
+
+	if row.Err() != nil {
+		return nil, utils.NewErrorCode(http.StatusInternalServerError, row.Err())
+	}
+
+	var userCount int
+	row.Scan(&userCount)
+
 	rows, err := r.db.Query(`
 		SELECT
 			id,
 			username,
 			email
 		FROM
-			users
-	`)
+			users;
+	`) // TODO: Add pagination
 	if err != nil {
-		return nil, err
+		return nil, utils.NewErrorCode(http.StatusInternalServerError, err)
 	}
 	defer rows.Close()
 
-	users := make([]*dtos.IdentifiedUser, 0)
+	users := make([]*dtos.IdentifiedUser, 0, userCount)
 
 	for rows.Next() {
 		user := new(dtos.IdentifiedUser)
 
+		if rows.Err() != nil {
+			return nil, utils.NewErrorCode(http.StatusInternalServerError, rows.Err())
+		}
+
 		err := rows.Scan(&user.ID, &user.UserName, &user.Email)
 		if err != nil {
-			return nil, err
+			return nil, utils.NewErrorCode(http.StatusNotFound, err)
 		}
 
 		users = append(users, user)

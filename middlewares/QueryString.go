@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/d1360-64rc14/simple-api/dtos"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,8 +23,8 @@ func ShouldHaveQuery(names ...string) func(ctx *gin.Context) {
 			return
 		}
 
-		errorMsg := "Query doesnt have elements " + strings.Join(notExistingNames, ", ")
-		ctx.String(http.StatusBadRequest, errorMsg)
+		errorMsg := "Query should have the following elements: " + strings.Join(notExistingNames, ", ")
+		ctx.JSON(http.StatusBadRequest, dtos.NewErrorMessageByString(errorMsg))
 		ctx.Abort()
 	}
 }

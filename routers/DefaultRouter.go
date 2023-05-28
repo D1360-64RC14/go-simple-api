@@ -35,11 +35,11 @@ func NewDefaultRouter(endpointPrefix string, userController interfaces.UserContr
 func (r DefaultRouter) setup() {
 	endpoint := r.engine.Group(r.endpointPrefix)
 
-	endpoint.GET("/user", middlewares.ShouldHaveQuery("id"), r.userController.Get)
+	endpoint.GET("/user/:id", r.userController.Get)
 	endpoint.GET("/users", r.userController.GetAll)
 	endpoint.POST("/user", r.userController.Create)
-	endpoint.PUT("/user", middlewares.ShouldHaveQuery("id"), r.userController.Update)
-	endpoint.DELETE("/user", middlewares.ShouldHaveQuery("id"), r.userController.Delete)
+	endpoint.PATCH("/user/:id", r.userController.Update)
+	endpoint.DELETE("/user/:id", r.userController.Delete)
 
 	endpoint.GET("/ping", r.ping)
 }
