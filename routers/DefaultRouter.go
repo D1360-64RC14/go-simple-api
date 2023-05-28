@@ -5,6 +5,7 @@ import (
 
 	"github.com/d1360-64rc14/simple-api/interfaces"
 	"github.com/d1360-64rc14/simple-api/middlewares"
+	"github.com/d1360-64rc14/simple-api/middlewares/validate"
 	"github.com/gin-gonic/gin"
 )
 
@@ -35,11 +36,11 @@ func NewDefaultRouter(endpointPrefix string, userController interfaces.UserContr
 func (r DefaultRouter) setup() {
 	endpoint := r.engine.Group(r.endpointPrefix)
 
-	endpoint.GET("/user/:id", r.userController.Get)
+	endpoint.GET("/user/:id", validate.PathId, r.userController.Get)
 	endpoint.GET("/users", r.userController.GetAll)
 	endpoint.POST("/user", r.userController.Create)
-	endpoint.PATCH("/user/:id", r.userController.Update)
-	endpoint.DELETE("/user/:id", r.userController.Delete)
+	endpoint.PATCH("/user/:id", validate.PathId, r.userController.Update)
+	endpoint.DELETE("/user/:id", validate.PathId, r.userController.Delete)
 
 	endpoint.GET("/ping", r.ping)
 }

@@ -3,7 +3,6 @@ package v1
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/d1360-64rc14/simple-api/config"
 	"github.com/d1360-64rc14/simple-api/dtos"
@@ -37,19 +36,11 @@ func (c DefaultUserController) GetAll(ctx *gin.Context) {
 }
 
 func (c DefaultUserController) Get(ctx *gin.Context) {
-	idString := ctx.Param("id")
-	id, err := strconv.ParseInt(idString, 10, 32)
-	if err != nil {
-		ctx.JSON(
-			http.StatusBadRequest,
-			dtos.NewErrorMessageByString(fmt.Sprintf("The user ID in the path should be an integer, not '%s'", idString)),
-		)
-		return
-	}
+	id := ctx.GetInt("id")
 
-	user, errC := c.service.SelectUserFromId(int(id))
-	if errC != nil {
-		ctx.Status(errC.Code())
+	user, err := c.service.SelectUserFromId(id)
+	if err != nil {
+		ctx.Status(err.Code())
 		return
 	}
 

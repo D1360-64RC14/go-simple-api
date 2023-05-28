@@ -1,4 +1,4 @@
-package middlewares
+package validate
 
 import (
 	"net/http"
@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ShouldHaveQuery(names ...string) func(ctx *gin.Context) {
+func QueryHave(names ...string) func(ctx *gin.Context) {
 	return func(ctx *gin.Context) {
 		notExistingNames := make([]string, 0, len(names))
 
