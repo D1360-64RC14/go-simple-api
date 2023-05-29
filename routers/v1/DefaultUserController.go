@@ -7,6 +7,7 @@ import (
 	"github.com/d1360-64rc14/simple-api/config"
 	"github.com/d1360-64rc14/simple-api/dtos"
 	"github.com/d1360-64rc14/simple-api/interfaces"
+	"github.com/d1360-64rc14/simple-api/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -34,7 +35,7 @@ func NewDefaultUserController(
 func (c DefaultUserController) GetAll(ctx *gin.Context) {
 	allUsers, err := c.service.SelectAllUsers()
 	if err != nil {
-		ctx.JSON(err.Code(), dtos.NewErrorMessage(err))
+		utils.ErrorResponse(ctx, err)
 		return
 	}
 
@@ -46,7 +47,7 @@ func (c DefaultUserController) Get(ctx *gin.Context) {
 
 	user, err := c.service.SelectUserFromId(id)
 	if err != nil {
-		ctx.Status(err.Code())
+		utils.ErrorResponse(ctx, err)
 		return
 	}
 
@@ -63,7 +64,7 @@ func (c DefaultUserController) Create(ctx *gin.Context) {
 
 	user, err := c.service.CreateUser(newUser)
 	if err != nil {
-		ctx.JSON(err.Code(), dtos.NewErrorMessage(err))
+		utils.ErrorResponse(ctx, err)
 		return
 	}
 
@@ -88,7 +89,8 @@ func (c DefaultUserController) Delete(ctx *gin.Context) {
 
 	err := c.service.RemoveUser(id)
 	if err != nil {
-		ctx.JSON(err.Code(), dtos.NewErrorMessage(err))
+		utils.ErrorResponse(ctx, err)
+		return
 	}
 
 	ctx.Status(http.StatusNoContent)
