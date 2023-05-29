@@ -8,6 +8,6 @@ func NewErrorMessage(err error) *ErrorMessage {
 	return &ErrorMessage{err.Error()}
 }
 
-func NewErrorMessageByString(errMsg string) *ErrorMessage {
+func NewErrorMessageString(errMsg string) *ErrorMessage {
 	return &ErrorMessage{errMsg}
 }

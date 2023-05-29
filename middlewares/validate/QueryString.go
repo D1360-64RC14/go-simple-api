@@ -24,7 +24,7 @@ func QueryHave(names ...string) func(ctx *gin.Context) {
 		}
 
 		errorMsg := "Query should have the following elements: " + strings.Join(notExistingNames, ", ")
-		ctx.JSON(http.StatusBadRequest, dtos.NewErrorMessageByString(errorMsg))
+		ctx.JSON(http.StatusBadRequest, dtos.NewErrorMessageString(errorMsg))
 		ctx.Abort()
 	}
 }

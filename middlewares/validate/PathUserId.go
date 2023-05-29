@@ -20,6 +20,6 @@ func PathUserId(ctx *gin.Context) {
 
 	ctx.AbortWithStatusJSON(
 		http.StatusBadRequest,
-		dtos.NewErrorMessageByString(fmt.Sprintf("The user ID in the path should be an integer, not '%s'", idString)),
+		dtos.NewErrorMessageString(fmt.Sprintf("The user ID in the path should be an integer, not '%s'", idString)),
 	)
 }
