@@ -1,11 +1,10 @@
 package main
 
 import (
-	"database/sql"
 	"log"
 
-	_ "github.com/proullon/ramsql/driver" // Needed to ramsql work
-
+	"github.com/d1360-64rc14/simple-api/config"
+	"github.com/d1360-64rc14/simple-api/database"
 	"github.com/d1360-64rc14/simple-api/repositories"
 	"github.com/d1360-64rc14/simple-api/routers"
 	v1 "github.com/d1360-64rc14/simple-api/routers/v1"
@@ -13,17 +12,20 @@ import (
 )
 
 func main() {
-	db, err := sql.Open("ramsql", "database")
+	settings, err := config.NewSettings("settings.yaml")
 	fatalErr(err)
 
-	userRepo, err := repositories.NewDefaultUserRepository(db)
+	database, err := database.NewRamMySQL(&settings.Database)
+	fatalErr(err)
+
+	userRepo, err := repositories.NewDefaultUserRepository(database)
 	fatalErr(err)
 
 	userService := services.NewDefaultUserService(userRepo)
-	userController := v1.NewDefaultUserController(userService, userRepo)
+	userController := v1.NewDefaultUserController(userService, userRepo, settings)
 
 	router := routers.NewDefaultRouter("/api/v1", userController)
-	router.Engine().Run("localhost:1360")
+	router.Engine().Run(settings.Api.BaseUrl)
 }
 
 func fatalErr(err error) {

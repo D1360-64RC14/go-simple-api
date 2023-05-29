@@ -14,14 +14,20 @@ import (
 var _ interfaces.UserController = (*DefaultUserController)(nil)
 
 type DefaultUserController struct {
-	service interfaces.UserService
-	repo    interfaces.UserRepository
+	service  interfaces.UserService
+	repo     interfaces.UserRepository
+	settings *config.Settings
 }
 
-func NewDefaultUserController(userService interfaces.UserService, userRepository interfaces.UserRepository) *DefaultUserController {
+func NewDefaultUserController(
+	userService interfaces.UserService,
+	userRepository interfaces.UserRepository,
+	settings *config.Settings,
+) interfaces.UserController {
 	return &DefaultUserController{
-		service: userService,
-		repo:    userRepository,
+		service:  userService,
+		repo:     userRepository,
+		settings: settings,
 	}
 }
 
@@ -61,7 +67,13 @@ func (c DefaultUserController) Create(ctx *gin.Context) {
 		return
 	}
 
-	newUserLocation := fmt.Sprintf("%s%s/%d", config.ApiUrl, ctx.Request.URL.Path, user.ID)
+	newUserLocation := fmt.Sprintf(
+		"%s://%s%s/%d",
+		c.settings.Api.Protocol,
+		c.settings.Api.BaseUrl,
+		ctx.Request.URL.Path,
+		user.ID,
+	)
 	ctx.Header("Location", newUserLocation)
 
 	ctx.JSON(http.StatusCreated, user)

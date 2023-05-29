@@ -17,9 +17,9 @@ type DefaultUserRepository struct {
 	db *sql.DB
 }
 
-func NewDefaultUserRepository(database *sql.DB) (interfaces.UserRepository, error) {
+func NewDefaultUserRepository(database interfaces.Database) (interfaces.UserRepository, error) {
 	repo := &DefaultUserRepository{
-		db: database,
+		db: database.DB(),
 	}
 
 	err := repo.createUserTableIfNotExist()
