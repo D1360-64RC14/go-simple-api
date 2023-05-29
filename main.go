@@ -15,7 +15,7 @@ func main() {
 	settings, err := config.NewSettings("settings.yaml")
 	fatalErr(err)
 
-	database, err := database.NewRamMySQL(&settings.Database)
+	database, err := database.NewMySQL(&settings.Database)
 	fatalErr(err)
 
 	userRepo, err := repositories.NewDefaultUserRepository(database)

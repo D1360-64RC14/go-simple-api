@@ -1,0 +1,9 @@
+services:
+  database:
+    image: mysql:8
+    container_name: MySQL-DB
+    environment:
+      MYSQL_ROOT_PASSWORD: mySecret_sUperUzer-password
+      MYSQL_DATABASE: superSystem
+    ports:
+      - 3306:3306
