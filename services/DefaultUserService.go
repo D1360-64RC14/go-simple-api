@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/d1360-64rc14/simple-api/dtos"
@@ -50,4 +51,20 @@ func (s DefaultUserService) SelectCompleteUserFromId(id int) (*dtos.IdentifiedUs
 
 func (s DefaultUserService) SelectAllUsers() ([]*dtos.IdentifiedUser, *utils.ErrorCode) {
 	return s.repo.SelectAllUsers()
+}
+
+func (s DefaultUserService) RemoveUser(id int) *utils.ErrorCode {
+	userExist, err := s.repo.UserExist(id)
+	if err != nil {
+		return err
+	}
+
+	if !userExist {
+		return utils.NewErrorCodeString(
+			http.StatusNotFound,
+			fmt.Sprintf("User ID %d doesn't exist", id),
+		)
+	}
+
+	return s.repo.RemoveUser(id)
 }

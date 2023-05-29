@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 
 	"github.com/d1360-64rc14/simple-api/dtos"
@@ -239,4 +240,78 @@ func (r DefaultUserRepository) SelectAllUsers() ([]*dtos.IdentifiedUser, *utils.
 	}
 
 	return users, nil
+}
+
+// RemoveUser removes an user from the database.
+//
+// Errors can be caused by:
+// transaction not beeing started;
+// transaction not beeing commited;
+// more than 1 user beeing found;
+// fail to get number of affected rows.
+func (r DefaultUserRepository) RemoveUser(id int) *utils.ErrorCode {
+	transaction, err := r.db.Begin()
+	if err != nil {
+		return utils.NewErrorCode(http.StatusInternalServerError, err)
+	}
+
+	result, err := transaction.Exec(`
+		DELETE FROM
+			users
+		WHERE
+			id = ?;
+	`, id)
+	if err != nil {
+		return utils.NewErrorCode(http.StatusBadRequest, err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return utils.NewErrorCode(http.StatusInternalServerError, err)
+	}
+
+	if rowsAffected > 1 {
+		transaction.Rollback()
+		return utils.NewErrorCodeString(
+			http.StatusConflict,
+			fmt.Sprintf("There was %d users with id %d. User not removed.", rowsAffected, id),
+		)
+	}
+
+	err = transaction.Commit()
+	if err != nil {
+		return utils.NewErrorCode(http.StatusInternalServerError, err)
+	}
+
+	return nil
+}
+
+// UserExist checks if an user with given id is present in the database.
+//
+// Errors can be caused by:
+// query failing.
+func (r DefaultUserRepository) UserExist(id int) (bool, *utils.ErrorCode) {
+	row := r.db.QueryRow(`
+		SELECT EXISTS (
+			SELECT
+				1
+			FROM
+				users
+			WHERE
+				id = ?
+		);
+	`, id)
+	if row.Err() != nil {
+		return false, utils.NewErrorCode(http.StatusInternalServerError, row.Err())
+	}
+
+	var userExist bool
+
+	err := row.Scan(&userExist)
+
+	if err != nil {
+		return false, utils.NewErrorCode(http.StatusInternalServerError, err)
+	}
+
+	return userExist, nil
 }

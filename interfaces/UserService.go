@@ -11,4 +11,5 @@ type UserService interface {
 	SelectUserHashFromId(id int) (string, *utils.ErrorCode)
 	SelectCompleteUserFromId(id int) (*dtos.IdentifiedUserWithHash, *utils.ErrorCode)
 	SelectAllUsers() ([]*dtos.IdentifiedUser, *utils.ErrorCode)
+	RemoveUser(id int) *utils.ErrorCode
 }

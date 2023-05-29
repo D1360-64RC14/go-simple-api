@@ -72,5 +72,12 @@ func (c DefaultUserController) Update(ctx *gin.Context) {
 }
 
 func (c DefaultUserController) Delete(ctx *gin.Context) {
-	ctx.Status(http.StatusNotImplemented)
+	id := ctx.GetInt("id")
+
+	err := c.service.RemoveUser(id)
+	if err != nil {
+		ctx.JSON(err.Code(), dtos.NewErrorMessage(err))
+	}
+
+	ctx.Status(http.StatusNoContent)
 }
