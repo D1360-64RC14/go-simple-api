@@ -1,7 +1,8 @@
 package config
 
 type Database struct {
-	Url          string `yaml:"url"`
+	Address      string `yaml:"address"`
 	DBName       string `yaml:"dbName"`
+	Username     string `yaml:"username"`
 	RootPassword string `yaml:"rootPassword"`
 }

@@ -3,6 +3,7 @@ api:
   protocol: https
 
 database:
-  url: test
+  address: localhost
+  username: root
   dbName: superSystem
   rootPassword: mySecret_sUperUzer-password
