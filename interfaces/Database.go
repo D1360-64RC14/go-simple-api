@@ -9,4 +9,5 @@ import (
 type Database interface {
 	Settings() *config.Database
 	DB() *sql.DB
+	Close() error
 }

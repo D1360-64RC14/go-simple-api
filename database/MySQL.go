@@ -44,3 +44,7 @@ func (d MySQL) Settings() *config.Database {
 func (d MySQL) DB() *sql.DB {
 	return d.database
 }
+
+func (d MySQL) Close() error {
+	return d.database.Close()
+}

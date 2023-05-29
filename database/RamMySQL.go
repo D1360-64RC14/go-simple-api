@@ -46,3 +46,7 @@ func (d RamMySQL) Settings() *config.Database {
 func (d RamMySQL) DB() *sql.DB {
 	return d.database
 }
+
+func (d RamMySQL) Close() error {
+	return d.database.Close()
+}
