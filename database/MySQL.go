@@ -2,6 +2,9 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
+
+	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/d1360-64rc14/simple-api/config"
 	"github.com/d1360-64rc14/simple-api/interfaces"
@@ -29,7 +32,15 @@ func NewMySQL(databaseSettings *config.Database) (interfaces.Database, error) {
 }
 
 func (d *MySQL) setup() (err error) {
-	d.database, err = sql.Open("mysql", d.Settings().DBName) // TODO: connect to MySQL database
+	dbSource := fmt.Sprintf(
+		"%s:%s@tcp(%s)/%s",
+		d.settings.Username,
+		d.settings.RootPassword,
+		d.settings.Address,
+		d.settings.DBName,
+	)
+
+	d.database, err = sql.Open("mysql", dbSource)
 	if err != nil {
 		return err
 	}
