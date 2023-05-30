@@ -68,3 +68,26 @@ func (s DefaultUserService) RemoveUser(id int) *utils.ErrorCode {
 
 	return s.repo.RemoveUser(id)
 }
+
+func (s DefaultUserService) UpdateUser(id int, newUserData *dtos.UserUpdate) *utils.ErrorCode {
+	userExist, err := s.repo.UserExist(id)
+	if err != nil {
+		return err
+	}
+
+	if !userExist {
+		return utils.NewErrorCodeString(
+			http.StatusNotFound,
+			fmt.Sprintf("User ID %d doesn't exist", id),
+		)
+	}
+
+	if newUserData.UserName != "" {
+		err := s.repo.UpdateUsername(id, newUserData.UserName)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}

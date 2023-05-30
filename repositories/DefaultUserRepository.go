@@ -315,3 +315,42 @@ func (r DefaultUserRepository) UserExist(id int) (bool, *utils.ErrorCode) {
 
 	return userExist, nil
 }
+
+func (r DefaultUserRepository) UpdateUsername(id int, newUsername string) *utils.ErrorCode {
+	transaction, err := r.db.Begin()
+	if err != nil {
+		return utils.NewErrorCode(http.StatusInternalServerError, err)
+	}
+
+	result, err := transaction.Exec(`
+		UPDATE
+			users
+		SET
+			username = ?
+		WHERE
+			id = ?;
+	`, id, newUsername)
+	if err != nil {
+		return utils.NewErrorCode(http.StatusBadRequest, err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return utils.NewErrorCode(http.StatusInternalServerError, err)
+	}
+
+	if rowsAffected > 1 {
+		transaction.Rollback()
+		return utils.NewErrorCodeString(
+			http.StatusConflict,
+			fmt.Sprintf("There was %d users with id %d. User not removed.", rowsAffected, id),
+		)
+	}
+
+	err = transaction.Commit()
+	if err != nil {
+		return utils.NewErrorCode(http.StatusInternalServerError, err)
+	}
+
+	return nil
+}

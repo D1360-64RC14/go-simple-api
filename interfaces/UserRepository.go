@@ -14,4 +14,5 @@ type UserRepository interface {
 	SelectAllUsers() ([]*dtos.IdentifiedUser, *utils.ErrorCode)
 	RemoveUser(id int) *utils.ErrorCode
 	UserExist(id int) (bool, *utils.ErrorCode)
+	UpdateUsername(id int, newUsername string) *utils.ErrorCode
 }

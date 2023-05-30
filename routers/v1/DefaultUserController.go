@@ -81,7 +81,22 @@ func (c DefaultUserController) Create(ctx *gin.Context) {
 }
 
 func (c DefaultUserController) Update(ctx *gin.Context) {
-	ctx.Status(http.StatusNotImplemented)
+	id := ctx.GetInt("id")
+
+	newUserData := new(dtos.UserUpdate)
+
+	if err := ctx.ShouldBindJSON(&newUserData); err != nil {
+		ctx.JSON(http.StatusBadRequest, dtos.NewErrorMessage(err))
+		return
+	}
+
+	err := c.service.UpdateUser(id, newUserData)
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+		return
+	}
+
+	ctx.Status(http.StatusNoContent)
 }
 
 func (c DefaultUserController) Delete(ctx *gin.Context) {
