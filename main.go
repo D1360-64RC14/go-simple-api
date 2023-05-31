@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/d1360-64rc14/simple-api/authentication"
 	"github.com/d1360-64rc14/simple-api/config"
 	"github.com/d1360-64rc14/simple-api/database"
 	"github.com/d1360-64rc14/simple-api/interfaces"
@@ -19,10 +20,13 @@ func main() {
 	database, err := database.NewMySQL(&settings.Database)
 	fatalErr(err)
 
+	authenticator, err := authentication.NewEd25519JWTAuthenticator(&settings.Auth)
+	fatalErr(err)
+
 	userRepo, err := repositories.NewDefaultUserRepository(database)
 	fatalErr(err)
 
-	userService := services.NewDefaultUserService(userRepo)
+	userService := services.NewDefaultUserService(userRepo, authenticator)
 	userController := v1.NewDefaultUserController(userService, userRepo, settings)
 
 	controllers := []interfaces.RouteController{

@@ -7,8 +7,9 @@ import (
 )
 
 type Settings struct {
-	Api      Api
-	Database Database
+	Api      Api      `json:"api"`
+	Database Database `json:"database"`
+	Auth     Auth     `json:"auth"`
 }
 
 func NewSettings(filename string) (*Settings, error) {

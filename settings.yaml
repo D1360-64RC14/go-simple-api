@@ -7,3 +7,6 @@ database:
   username: root
   dbName: superSystem
   rootPassword: mySecret_sUperUzer-password
+
+auth:
+  base64TokenSeed: dGhlcXVpY2tmb3hqdW1wc292ZXJ0aGVsYXp5ZG9nIQo= # 32 bytes wide seed

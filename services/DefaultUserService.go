@@ -15,11 +15,13 @@ var _ interfaces.UserService = (*DefaultUserService)(nil)
 
 type DefaultUserService struct {
 	repo interfaces.UserRepository
+	auth interfaces.Authenticator
 }
 
-func NewDefaultUserService(userRepository interfaces.UserRepository) interfaces.UserService {
+func NewDefaultUserService(userRepository interfaces.UserRepository, authenticator interfaces.Authenticator) interfaces.UserService {
 	return &DefaultUserService{
 		repo: userRepository,
+		auth: authenticator,
 	}
 }
 
@@ -90,4 +92,9 @@ func (s DefaultUserService) UpdateUser(id int, newUserData *dtos.UserUpdate) *ut
 	}
 
 	return nil
+}
+
+func (s DefaultUserService) AuthenticateUser(email, password string) (string, *utils.ErrorCode) {
+	// TODO: authentication
+	return "", nil
 }
