@@ -1,5 +1,6 @@
 package utils
 
+// ErrorCode implements error
 var _ error = (*ErrorCode)(nil)
 
 type ErrorCode struct {

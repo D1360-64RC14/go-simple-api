@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// DefaultUserController implements UserController
+// DefaultUserController implements RouteController
 var _ interfaces.RouteController = (*DefaultUserController)(nil)
 
 type DefaultUserController struct {
