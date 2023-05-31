@@ -29,8 +29,8 @@ func main() {
 		userController,
 	}
 
-	router := routers.NewDefaultRouter("/api/v1", controllers)
-	router.Engine().Run(settings.Api.BaseUrl)
+	v1router := routers.NewDefaultV1Router("/api", controllers)
+	v1router.Engine().Run(settings.Api.BaseUrl)
 }
 
 func fatalErr(err error) {

@@ -12,19 +12,23 @@ import (
 var _ interfaces.Router = (*DefaultRouter)(nil)
 
 type DefaultRouter struct {
+	version          string
 	endpointPrefix   string
 	engine           *gin.Engine
 	routeControllers []interfaces.RouteController
 }
 
-func NewDefaultRouter(endpointPrefix string, routeControllers []interfaces.RouteController) interfaces.Router {
+func NewDefaultV1Router(endpointPrefix string, routeControllers []interfaces.RouteController) interfaces.Router {
+	version := "v1"
+
 	router := &DefaultRouter{
-		endpointPrefix:   endpointPrefix,
+		version:          version,
+		endpointPrefix:   endpointPrefix + "/" + version,
 		engine:           gin.Default(),
 		routeControllers: routeControllers,
 	}
 
-	router.engine.Static("/api/docs", "routers/docs")
+	router.engine.Static(endpointPrefix+"/docs", "routers/docs")
 	router.engine.Use(middlewares.CORS)
 
 	router.setupRoutes()
@@ -51,4 +55,8 @@ func (r DefaultRouter) Engine() *gin.Engine {
 
 func (r DefaultRouter) EndpointPrefix() string {
 	return r.endpointPrefix
+}
+
+func (r DefaultRouter) Version() string {
+	return r.version
 }
