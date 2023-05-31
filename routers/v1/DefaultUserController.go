@@ -34,11 +34,11 @@ func NewDefaultUserController(
 }
 
 func (c DefaultUserController) AttachTo(group *gin.RouterGroup) {
-	group.GET("/user/:id", validate.PathUserId, c.get)
+	group.GET("/user/:id", validate.PathUserId, validate.UserIdExist(c.repo), c.get)
 	group.GET("/users", c.getAll)
 	group.POST("/user", c.create)
-	group.PATCH("/user/:id", validate.PathUserId, c.update)
-	group.DELETE("/user/:id", validate.PathUserId, c.delete)
+	group.PATCH("/user/:id", validate.PathUserId, validate.UserIdExist(c.repo), c.update)
+	group.DELETE("/user/:id", validate.PathUserId, validate.UserIdExist(c.repo), c.delete)
 }
 
 func (c DefaultUserController) getAll(ctx *gin.Context) {
