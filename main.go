@@ -5,6 +5,7 @@ import (
 
 	"github.com/d1360-64rc14/simple-api/config"
 	"github.com/d1360-64rc14/simple-api/database"
+	"github.com/d1360-64rc14/simple-api/interfaces"
 	"github.com/d1360-64rc14/simple-api/repositories"
 	"github.com/d1360-64rc14/simple-api/routers"
 	v1 "github.com/d1360-64rc14/simple-api/routers/v1"
@@ -24,7 +25,11 @@ func main() {
 	userService := services.NewDefaultUserService(userRepo)
 	userController := v1.NewDefaultUserController(userService, userRepo, settings)
 
-	router := routers.NewDefaultRouter("/api/v1", userController)
+	controllers := []interfaces.RouteController{
+		userController,
+	}
+
+	router := routers.NewDefaultRouter("/api/v1", controllers)
 	router.Engine().Run(settings.Api.BaseUrl)
 }
 

@@ -7,12 +7,13 @@ import (
 	"github.com/d1360-64rc14/simple-api/config"
 	"github.com/d1360-64rc14/simple-api/dtos"
 	"github.com/d1360-64rc14/simple-api/interfaces"
+	"github.com/d1360-64rc14/simple-api/middlewares/validate"
 	"github.com/d1360-64rc14/simple-api/utils"
 	"github.com/gin-gonic/gin"
 )
 
 // DefaultUserController implements UserController
-var _ interfaces.UserController = (*DefaultUserController)(nil)
+var _ interfaces.RouteController = (*DefaultUserController)(nil)
 
 type DefaultUserController struct {
 	service  interfaces.UserService
@@ -24,7 +25,7 @@ func NewDefaultUserController(
 	userService interfaces.UserService,
 	userRepository interfaces.UserRepository,
 	settings *config.Settings,
-) interfaces.UserController {
+) interfaces.RouteController {
 	return &DefaultUserController{
 		service:  userService,
 		repo:     userRepository,
@@ -32,7 +33,15 @@ func NewDefaultUserController(
 	}
 }
 
-func (c DefaultUserController) GetAll(ctx *gin.Context) {
+func (c DefaultUserController) AttachTo(group *gin.RouterGroup) {
+	group.GET("/user/:id", validate.PathUserId, c.get)
+	group.GET("/users", c.getAll)
+	group.POST("/user", c.create)
+	group.PATCH("/user/:id", validate.PathUserId, c.update)
+	group.DELETE("/user/:id", validate.PathUserId, c.delete)
+}
+
+func (c DefaultUserController) getAll(ctx *gin.Context) {
 	allUsers, err := c.service.SelectAllUsers()
 	if err != nil {
 		utils.ErrorResponse(ctx, err)
@@ -42,7 +51,7 @@ func (c DefaultUserController) GetAll(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, allUsers)
 }
 
-func (c DefaultUserController) Get(ctx *gin.Context) {
+func (c DefaultUserController) get(ctx *gin.Context) {
 	id := ctx.GetInt("id")
 
 	user, err := c.service.SelectUserFromId(id)
@@ -54,7 +63,7 @@ func (c DefaultUserController) Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, user)
 }
 
-func (c DefaultUserController) Create(ctx *gin.Context) {
+func (c DefaultUserController) create(ctx *gin.Context) {
 	var newUser dtos.UserWithPassword
 
 	if err := ctx.ShouldBindJSON(&newUser); err != nil {
@@ -80,7 +89,7 @@ func (c DefaultUserController) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, user)
 }
 
-func (c DefaultUserController) Update(ctx *gin.Context) {
+func (c DefaultUserController) update(ctx *gin.Context) {
 	id := ctx.GetInt("id")
 
 	newUserData := new(dtos.UserUpdate)
@@ -99,7 +108,7 @@ func (c DefaultUserController) Update(ctx *gin.Context) {
 	ctx.Status(http.StatusNoContent)
 }
 
-func (c DefaultUserController) Delete(ctx *gin.Context) {
+func (c DefaultUserController) delete(ctx *gin.Context) {
 	id := ctx.GetInt("id")
 
 	err := c.service.RemoveUser(id)

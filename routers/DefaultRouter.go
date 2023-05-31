@@ -5,7 +5,6 @@ import (
 
 	"github.com/d1360-64rc14/simple-api/interfaces"
 	"github.com/d1360-64rc14/simple-api/middlewares"
-	"github.com/d1360-64rc14/simple-api/middlewares/validate"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,36 +12,33 @@ import (
 var _ interfaces.Router = (*DefaultRouter)(nil)
 
 type DefaultRouter struct {
-	endpointPrefix string
-	engine         *gin.Engine
-	userController interfaces.UserController
+	endpointPrefix   string
+	engine           *gin.Engine
+	routeControllers []interfaces.RouteController
 }
 
-func NewDefaultRouter(endpointPrefix string, userController interfaces.UserController) interfaces.Router {
+func NewDefaultRouter(endpointPrefix string, routeControllers []interfaces.RouteController) interfaces.Router {
 	router := &DefaultRouter{
-		endpointPrefix: endpointPrefix,
-		engine:         gin.Default(),
-		userController: userController,
+		endpointPrefix:   endpointPrefix,
+		engine:           gin.Default(),
+		routeControllers: routeControllers,
 	}
 
 	router.engine.Static("/api/docs", "routers/docs")
 	router.engine.Use(middlewares.CORS)
 
-	router.setup()
+	router.setupRoutes()
 
 	return router
 }
 
-func (r DefaultRouter) setup() {
+func (r DefaultRouter) setupRoutes() {
 	endpoint := r.engine.Group(r.endpointPrefix)
-
-	endpoint.GET("/user/:id", validate.PathUserId, r.userController.Get)
-	endpoint.GET("/users", r.userController.GetAll)
-	endpoint.POST("/user", r.userController.Create)
-	endpoint.PATCH("/user/:id", validate.PathUserId, r.userController.Update)
-	endpoint.DELETE("/user/:id", validate.PathUserId, r.userController.Delete)
-
 	endpoint.GET("/ping", r.ping)
+
+	for _, group := range r.routeControllers {
+		group.AttachTo(endpoint)
+	}
 }
 
 func (r DefaultRouter) ping(ctx *gin.Context) {
