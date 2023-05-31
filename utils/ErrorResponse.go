@@ -7,11 +7,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ErrorResponse(ctx *gin.Context, err *ErrorCode) {
+func rule(err *ErrorCode, statusOnly func(int), statusJSON func(int, any)) {
 	if err.Code() == http.StatusNotFound {
-		ctx.Status(err.Code())
+		statusOnly(err.Code())
 		return
 	}
 
-	ctx.JSON(err.Code(), dtos.NewErrorMessage(err))
+	statusJSON(err.Code(), dtos.NewErrorMessage(err))
+}
+
+func ErrorResponse(ctx *gin.Context, err *ErrorCode) {
+	rule(err, ctx.Status, ctx.JSON)
+}
+
+func ErrorAbortResponse(ctx *gin.Context, err *ErrorCode) {
+	rule(err, ctx.AbortWithStatus, ctx.AbortWithStatusJSON)
 }

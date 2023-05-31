@@ -3,8 +3,8 @@ package validate
 import (
 	"net/http"
 
-	"github.com/d1360-64rc14/simple-api/dtos"
 	"github.com/d1360-64rc14/simple-api/interfaces"
+	"github.com/d1360-64rc14/simple-api/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,7 +14,7 @@ func UserIdExist(userRepository interfaces.UserRepository) func(*gin.Context) {
 
 		exist, err := userRepository.UserExist(id)
 		if err != nil {
-			ctx.AbortWithStatusJSON(err.Code(), dtos.NewErrorMessage(err))
+			utils.ErrorAbortResponse(ctx, err)
 			return
 		}
 
