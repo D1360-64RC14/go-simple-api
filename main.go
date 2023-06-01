@@ -26,7 +26,7 @@ func main() {
 	userRepo, err := repositories.NewDefaultUserRepository(database)
 	fatalErr(err)
 
-	userService := services.NewDefaultUserService(userRepo, authenticator)
+	userService := services.NewDefaultUserService(userRepo, authenticator, settings)
 	userController := v1.NewDefaultUserController(userService, userRepo, settings)
 
 	controllers := []interfaces.RouteController{

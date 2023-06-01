@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/d1360-64rc14/simple-api/config"
 	"github.com/d1360-64rc14/simple-api/dtos"
 	"github.com/d1360-64rc14/simple-api/interfaces"
 	"github.com/d1360-64rc14/simple-api/utils"
@@ -14,14 +15,20 @@ import (
 var _ interfaces.UserService = (*DefaultUserService)(nil)
 
 type DefaultUserService struct {
-	repo interfaces.UserRepository
-	auth interfaces.Authenticator
+	repo     interfaces.UserRepository
+	auth     interfaces.Authenticator
+	settings *config.Settings
 }
 
-func NewDefaultUserService(userRepository interfaces.UserRepository, authenticator interfaces.Authenticator) interfaces.UserService {
+func NewDefaultUserService(
+	userRepository interfaces.UserRepository,
+	authenticator interfaces.Authenticator,
+	settings *config.Settings,
+) interfaces.UserService {
 	return &DefaultUserService{
-		repo: userRepository,
-		auth: authenticator,
+		repo:     userRepository,
+		auth:     authenticator,
+		settings: settings,
 	}
 }
 
