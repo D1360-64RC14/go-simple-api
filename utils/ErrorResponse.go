@@ -23,7 +23,7 @@ func ErrorResponse(ctx *gin.Context, err *ErrorCode) {
 	rule(err, ctx.Status, ctx.JSON)
 }
 
-// ErrorResponse sends a ctx.Status or ctx.JSON response.
+// ErrorResponse sends a ctx.AbortWithStatus or ctx.AbortWithStatusJSON response.
 //
 // Used inside mniddlewares.
 func ErrorAbortResponse(ctx *gin.Context, err *ErrorCode) {
