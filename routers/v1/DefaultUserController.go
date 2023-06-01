@@ -122,5 +122,17 @@ func (c DefaultUserController) delete(ctx *gin.Context) {
 }
 
 func (c DefaultUserController) login(ctx *gin.Context) {
-	ctx.Status(http.StatusNotImplemented)
+	var authData dtos.LoginRequest
+
+	if err := ctx.ShouldBindJSON(&authData); err != nil {
+		ctx.JSON(http.StatusBadRequest, dtos.NewErrorMessage(err))
+		return
+	}
+
+	tokenRes, err := c.service.LoginUser(&authData)
+	if err != nil {
+		utils.ErrorResponse(ctx, err)
+	}
+
+	ctx.JSON(http.StatusOK, tokenRes)
 }
