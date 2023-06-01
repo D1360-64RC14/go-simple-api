@@ -94,6 +94,7 @@ func (s DefaultUserService) UpdateUser(id int, newUserData *dtos.UserUpdate) *ut
 	return nil
 }
 
+// AuthenticateUser returns the JWT token as result of the authentication
 func (s DefaultUserService) AuthenticateUser(email, password string) (string, *utils.ErrorCode) {
 	// TODO: authentication
 	return "", nil
