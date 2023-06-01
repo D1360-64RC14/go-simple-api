@@ -102,7 +102,7 @@ func (s DefaultUserService) UpdateUser(id int, newUserData *dtos.UserUpdate) *ut
 }
 
 // AuthenticateUser returns the JWT token as result of the authentication
-func (s DefaultUserService) AuthenticateUser(email, password string) (string, *utils.ErrorCode) {
+func (s DefaultUserService) AuthenticateUser(email string) (string, *utils.ErrorCode) {
 	user, errC := s.repo.SelectUserFromEmail(email)
 	if errC != nil {
 		return "", errC

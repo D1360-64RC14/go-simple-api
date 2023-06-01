@@ -13,5 +13,5 @@ type UserService interface {
 	SelectAllUsers() ([]*dtos.IdentifiedUser, *utils.ErrorCode)
 	RemoveUser(id int) *utils.ErrorCode
 	UpdateUser(id int, newUserData *dtos.UserUpdate) *utils.ErrorCode
-	AuthenticateUser(email, password string) (string, *utils.ErrorCode)
+	AuthenticateUser(email string) (string, *utils.ErrorCode)
 }
