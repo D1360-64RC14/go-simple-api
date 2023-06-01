@@ -33,7 +33,7 @@ func NewDefaultUserService(
 }
 
 func (s DefaultUserService) CreateUser(user dtos.UserWithPassword) (*dtos.IdentifiedUser, *utils.ErrorCode) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), 12)
+	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), s.settings.Auth.BCryptCost)
 	if err != nil {
 		return nil, utils.NewErrorCode(http.StatusBadRequest, err)
 	}
