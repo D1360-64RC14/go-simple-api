@@ -39,6 +39,7 @@ func (c DefaultUserController) AttachTo(group *gin.RouterGroup) {
 	group.POST("/user", c.create)
 	group.PATCH("/user/:id", validate.PathUserId, validate.UserIdExist(c.repo), c.update)
 	group.DELETE("/user/:id", validate.PathUserId, validate.UserIdExist(c.repo), c.delete)
+	group.POST("/user/login", c.login)
 }
 
 func (c DefaultUserController) getAll(ctx *gin.Context) {
@@ -118,4 +119,8 @@ func (c DefaultUserController) delete(ctx *gin.Context) {
 	}
 
 	ctx.Status(http.StatusNoContent)
+}
+
+func (c DefaultUserController) login(ctx *gin.Context) {
+	ctx.Status(http.StatusNotImplemented)
 }
