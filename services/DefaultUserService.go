@@ -116,8 +116,8 @@ func (s DefaultUserService) AuthenticateUser(email string) (string, *utils.Error
 	return jwtToken, nil
 }
 
-func (s DefaultUserService) LoginUser(email, password string) (*dtos.TokenResponse, *utils.ErrorCode) {
-	user, errC := s.repo.SelectUserFromEmail(email)
+func (s DefaultUserService) LoginUser(request *dtos.LoginRequest) (*dtos.TokenResponse, *utils.ErrorCode) {
+	user, errC := s.repo.SelectUserFromEmail(request.Email)
 	if errC != nil {
 		return nil, errC
 	}
@@ -127,7 +127,7 @@ func (s DefaultUserService) LoginUser(email, password string) (*dtos.TokenRespon
 		return nil, errC
 	}
 
-	err := bcrypt.CompareHashAndPassword([]byte(userHash), []byte(password))
+	err := bcrypt.CompareHashAndPassword([]byte(userHash), []byte(request.Password))
 	if err != nil {
 		return nil, utils.NewErrorCodeString(http.StatusUnauthorized, "Invalid password")
 	}
