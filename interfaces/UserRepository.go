@@ -8,6 +8,7 @@ import (
 type UserRepository interface {
 	Close() error
 	CreateUser(user *dtos.UserWithHash) (*dtos.IdentifiedUser, *utils.ErrorCode)
+	SelectUserFromEmail(email string) (*dtos.IdentifiedUser, *utils.ErrorCode)
 	SelectUserFromId(id int) (*dtos.IdentifiedUser, *utils.ErrorCode)
 	SelectUserHashFromId(id int) (string, *utils.ErrorCode)
 	SelectCompleteUserFromId(id int) (*dtos.IdentifiedUserWithHash, *utils.ErrorCode)

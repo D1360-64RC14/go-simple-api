@@ -131,6 +131,35 @@ func (r DefaultUserRepository) SelectUserFromId(id int) (*dtos.IdentifiedUser, *
 	return user, nil
 }
 
+// SelectUserFromEmail returns the identified user from their email.
+//
+// Errors can be caused by:
+func (r DefaultUserRepository) SelectUserFromEmail(email string) (*dtos.IdentifiedUser, *utils.ErrorCode) {
+	row := r.db.QueryRow(`
+		SELECT
+			id,
+			email,
+			username
+		FROM
+			users
+		WHERE
+			email = ?
+	`, email)
+
+	if row.Err() != nil {
+		return nil, utils.NewErrorCode(http.StatusInternalServerError, row.Err())
+	}
+
+	user := new(dtos.IdentifiedUser)
+
+	err := row.Scan(&user.ID, &user.Email, &user.UserName)
+	if err != nil {
+		return nil, utils.NewErrorCode(http.StatusNotFound, err)
+	}
+
+	return user, nil
+}
+
 // SelectUserHashFromId returns the user password hash from database.
 //
 // Errors can be caused by:
