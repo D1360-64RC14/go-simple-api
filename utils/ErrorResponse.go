@@ -16,10 +16,16 @@ func rule(err *ErrorCode, statusOnly func(int), statusJSON func(int, any)) {
 	statusJSON(err.Code(), dtos.NewErrorMessage(err))
 }
 
+// ErrorResponse sends a ctx.Status or ctx.JSON response.
+//
+// Used at the end of an endpoint.
 func ErrorResponse(ctx *gin.Context, err *ErrorCode) {
 	rule(err, ctx.Status, ctx.JSON)
 }
 
+// ErrorResponse sends a ctx.Status or ctx.JSON response.
+//
+// Used inside mniddlewares.
 func ErrorAbortResponse(ctx *gin.Context, err *ErrorCode) {
 	rule(err, ctx.AbortWithStatus, ctx.AbortWithStatusJSON)
 }
