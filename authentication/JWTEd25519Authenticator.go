@@ -62,5 +62,5 @@ func (a JWTEd25519Authenticator) keyFunc(token *jwt.Token) (interface{}, error) 
 		return nil, fmt.Errorf("unexpected signing method %s", token.Method.Alg())
 	}
 
-	return a.privKey, nil
+	return a.pubKey, nil
 }
