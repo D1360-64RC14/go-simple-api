@@ -64,6 +64,12 @@ func TestQueryHave_WithTwoQueries(t *testing.T) {
 		{http.StatusOK, "foo=&bar=", ""},
 		{http.StatusOK, "foo=baz&d=g&bar=none", "baznone"},
 		{http.StatusOK, "foo=done&d=g&k=v&bar=0", "done0"},
+		{http.StatusBadRequest, "bar=bz", "{\"error\":\"Query should have the following elements: foo\"}"},
+		{http.StatusBadRequest, "foo=1337", "{\"error\":\"Query should have the following elements: bar\"}"},
+		{http.StatusBadRequest, "k=v", "{\"error\":\"Query should have the following elements: foo, bar\"}"},
+		{http.StatusBadRequest, "k=v&foo=42", "{\"error\":\"Query should have the following elements: bar\"}"},
+		{http.StatusBadRequest, "baz=foo", "{\"error\":\"Query should have the following elements: foo, bar\"}"},
+		{http.StatusBadRequest, "foo=13&baz=42&name=none", "{\"error\":\"Query should have the following elements: bar\"}"},
 	}
 
 	engine := gin.New()
