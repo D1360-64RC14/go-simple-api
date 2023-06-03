@@ -87,12 +87,18 @@ func testTokenIsValid_WithValidToken(authenticator interfaces.Authenticator) fun
 
 func testTokenIsValid_WithTamperedToken(authenticator interfaces.Authenticator) func(*testing.T) {
 	return func(t *testing.T) {
-		tamperedToken := "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im00MWxAc2VydmVyLmNvbSIsImlkIjoxMjN9.L4CMw6zhZBrfPNs5QhPr3XebPqgKuf1ffi8QkYyK3WK9LoNN73p8bnt761PNykV4GOdJC3A3rqBnT33G1a6IBA"
+		tamperedTokens := []string{
+			"eyJhbGciOiJFRERTQSIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWxAc2VydmVyLmNvbSIsImlkIjoxMjN9.L4CMw6zhZBrfPNs5QhPr3XebPqgKuf1ffi8QkYyK3WK9LoNN73p8bnt761PNykV4GOdJC3A3rqBnT33G1a6IBA",
+			"eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im00MWxAc2VydmVyLmNvbSIsImlkIjoxMjN9.L4CMw6zhZBrfPNs5QhPr3XebPqgKuf1ffi8QkYyK3WK9LoNN73p8bnt761PNykV4GOdJC3A3rqBnT33G1a6IBA",
+			"eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWxAc2VydmVyLmNvbSIsImlkIjoxMjN9.L4CMw6zhZBrfPNs5QhPr3XebPqgKuf1ffi8QkYyK3WK9LoNN73p8bnt761PNykV4GOdJC3A3rqBnT33G1a6IBa",
+		}
 
-		valid := authenticator.IsTokenValid(tamperedToken)
+		for _, tamperedToken := range tamperedTokens {
+			valid := authenticator.IsTokenValid(tamperedToken)
 
-		if valid != false {
-			t.Error("token should be invalid, got valid")
+			if valid != false {
+				t.Error("token should be invalid, got valid")
+			}
 		}
 	}
 }
