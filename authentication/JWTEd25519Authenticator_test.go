@@ -39,3 +39,20 @@ func TestNewJWTEd25519Authenticator_WithValidSeedLength(t *testing.T) {
 		t.Error("authenticator was nil")
 	}
 }
+
+func TestGenerateToken(t *testing.T) {
+	authenticator, err := NewJWTEd25519Authenticator(validSettings)
+	if err != nil {
+		t.Fatal(err)
+	}
+	resultToken := "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWxAc2VydmVyLmNvbSIsImlkIjoxMjN9.L4CMw6zhZBrfPNs5QhPr3XebPqgKuf1ffi8QkYyK3WK9LoNN73p8bnt761PNykV4GOdJC3A3rqBnT33G1a6IBA"
+
+	tokenStr, err := authenticator.GenerateToken(123, "mail@server.com")
+	if err != nil {
+		t.FailNow()
+	}
+
+	if tokenStr != resultToken {
+		t.Errorf("token should be '%s', got '%s'", resultToken, tokenStr)
+	}
+}
