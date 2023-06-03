@@ -49,8 +49,8 @@ func (a JWTEd25519Authenticator) GenerateToken(id int, email string) (string, er
 }
 
 func (a JWTEd25519Authenticator) IsTokenValid(inputToken string) bool {
-	_, err := jwt.Parse(inputToken, a.keyFunc)
-	if err != nil {
+	token, err := jwt.Parse(inputToken, a.keyFunc)
+	if err != nil || !token.Valid {
 		return false
 	}
 
