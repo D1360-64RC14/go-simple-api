@@ -9,5 +9,5 @@ database:
   rootPassword: mySecret_sUperUzer-password
 
 auth:
-  base64TokenSeed: dGhlcXVpY2tmb3hqdW1wc292ZXJ0aGVsYXp5ZG9nIQ== # 32 bytes wide seed
+  base64TokenSeed: IXRoZXF1aWNrZm94anVtcHNvdmVydGhlbGF6eWRvZyE # 32 bytes wide seed
   bcryptCost: 12
