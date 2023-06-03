@@ -48,13 +48,13 @@ func (a JWTEd25519Authenticator) GenerateToken(id int, email string) (string, er
 	return token.SignedString(a.privKey)
 }
 
-func (a JWTEd25519Authenticator) IsTokenValid(inputToken string) (bool, error) {
-	token, err := jwt.Parse(inputToken, a.keyFunc)
+func (a JWTEd25519Authenticator) IsTokenValid(inputToken string) bool {
+	_, err := jwt.Parse(inputToken, a.keyFunc)
 	if err != nil {
-		return false, err
+		return false
 	}
 
-	return token.Valid, err
+	return true
 }
 
 func (a JWTEd25519Authenticator) keyFunc(token *jwt.Token) (interface{}, error) {
