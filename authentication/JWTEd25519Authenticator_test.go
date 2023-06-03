@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/d1360-64rc14/simple-api/config"
+	"github.com/d1360-64rc14/simple-api/interfaces"
 )
 
 var validSettings = &config.Auth{
@@ -11,7 +12,22 @@ var validSettings = &config.Auth{
 	BCryptCost:      12,
 }
 
-func TestNewJWTEd25519Authenticator_WithInvalidSeedLength(t *testing.T) {
+func TestNewJWTEd25519Authenticator(t *testing.T) {
+	t.Run("WithValidSeedLength", testNewJWTEd25519Authenticator_WithValidSeedLength)
+	t.Run("WithInvalidSeedLength", testNewJWTEd25519Authenticator_WithInvalidSeedLength)
+}
+
+func testNewJWTEd25519Authenticator_WithValidSeedLength(t *testing.T) {
+	authenticator, err := NewJWTEd25519Authenticator(validSettings)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if authenticator == nil {
+		t.Error("authenticator was nil")
+	}
+}
+
+func testNewJWTEd25519Authenticator_WithInvalidSeedLength(t *testing.T) {
 	invalidSettings := &config.Auth{
 		Base64TokenSeed: "dGhlcXVpY2tmb3hqdW1wc292ZXJ0aGVsYXp5ZG9nIQ", // Token have 31 chars
 		BCryptCost:      12,
@@ -28,16 +44,6 @@ func TestNewJWTEd25519Authenticator_WithInvalidSeedLength(t *testing.T) {
 	}()
 
 	NewJWTEd25519Authenticator(invalidSettings)
-}
-
-func TestNewJWTEd25519Authenticator_WithValidSeedLength(t *testing.T) {
-	authenticator, err := NewJWTEd25519Authenticator(validSettings)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if authenticator == nil {
-		t.Error("authenticator was nil")
-	}
 }
 
 func TestGenerateToken(t *testing.T) {
@@ -57,30 +63,36 @@ func TestGenerateToken(t *testing.T) {
 	}
 }
 
-func TestTokenIsValid_WithValidToken(t *testing.T) {
+func TestTokenIsValid(t *testing.T) {
 	authenticator, err := NewJWTEd25519Authenticator(validSettings)
 	if err != nil {
 		t.Fatal(err)
 	}
-	validToken := "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWxAc2VydmVyLmNvbSIsImlkIjoxMjN9.L4CMw6zhZBrfPNs5QhPr3XebPqgKuf1ffi8QkYyK3WK9LoNN73p8bnt761PNykV4GOdJC3A3rqBnT33G1a6IBA"
 
-	valid := authenticator.IsTokenValid(validToken)
+	t.Run("WithValidToken", testTokenIsValid_WithValidToken(authenticator))
+	t.Run("WithTamperedToken", testTokenIsValid_WithTamperedToken(authenticator))
+}
 
-	if valid != true {
-		t.Error("token should be valid, got invalid")
+func testTokenIsValid_WithValidToken(authenticator interfaces.Authenticator) func(*testing.T) {
+	return func(t *testing.T) {
+		validToken := "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWxAc2VydmVyLmNvbSIsImlkIjoxMjN9.L4CMw6zhZBrfPNs5QhPr3XebPqgKuf1ffi8QkYyK3WK9LoNN73p8bnt761PNykV4GOdJC3A3rqBnT33G1a6IBA"
+
+		valid := authenticator.IsTokenValid(validToken)
+
+		if valid != true {
+			t.Error("token should be valid, got invalid")
+		}
 	}
 }
 
-func TestTokenIsValid_WithTamperedToken(t *testing.T) {
-	authenticator, err := NewJWTEd25519Authenticator(validSettings)
-	if err != nil {
-		t.Fatal(err)
-	}
-	tamperedToken := "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im00MWxAc2VydmVyLmNvbSIsImlkIjoxMjN9.L4CMw6zhZBrfPNs5QhPr3XebPqgKuf1ffi8QkYyK3WK9LoNN73p8bnt761PNykV4GOdJC3A3rqBnT33G1a6IBA"
+func testTokenIsValid_WithTamperedToken(authenticator interfaces.Authenticator) func(*testing.T) {
+	return func(t *testing.T) {
+		tamperedToken := "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im00MWxAc2VydmVyLmNvbSIsImlkIjoxMjN9.L4CMw6zhZBrfPNs5QhPr3XebPqgKuf1ffi8QkYyK3WK9LoNN73p8bnt761PNykV4GOdJC3A3rqBnT33G1a6IBA"
 
-	valid := authenticator.IsTokenValid(tamperedToken)
+		valid := authenticator.IsTokenValid(tamperedToken)
 
-	if valid != false {
-		t.Error("token should be invalid, got valid")
+		if valid != false {
+			t.Error("token should be invalid, got valid")
+		}
 	}
 }
