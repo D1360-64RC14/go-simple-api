@@ -64,7 +64,7 @@ func TestGenerateToken(t *testing.T) {
 }
 
 func TestTokenIsValid(t *testing.T) {
-	testingCauses := []struct {
+	testCases := []struct {
 		isValid bool
 		token   string
 	}{
@@ -79,12 +79,12 @@ func TestTokenIsValid(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for i, cause := range testingCauses {
+	for i, _case := range testCases {
 		t.Run(fmt.Sprintf("token_%d", i), func(t *testing.T) {
-			valid := authenticator.IsTokenValid(cause.token)
+			valid := authenticator.IsTokenValid(_case.token)
 
-			if valid != cause.isValid {
-				t.Errorf("Expected %t, got %t", cause.isValid, valid)
+			if valid != _case.isValid {
+				t.Errorf("Expected %t, got %t", _case.isValid, valid)
 			}
 		})
 	}
