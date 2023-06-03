@@ -3,6 +3,7 @@ package validate
 import (
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -24,6 +25,7 @@ func TestQueryHave(t *testing.T) {
 
 	t.Run("WithFoo", testQueryHave_WithFoo(engine))
 	t.Run("WithFooBar", testQueryHave_WithFooBar(engine))
+	t.Run("WithoutFoo", testQueryHave_WithoutFoo(engine))
 }
 
 func testQueryHave_WithFoo(engine *gin.Engine) func(*testing.T) {
@@ -85,6 +87,30 @@ func testQueryHave_WithFooBar(engine *gin.Engine) func(*testing.T) {
 			}
 			if body != resultingBody {
 				t.Errorf("Returned body should be '%s', got '%s'", resultingBody, body)
+			}
+		}
+	}
+}
+
+func testQueryHave_WithoutFoo(engine *gin.Engine) func(*testing.T) {
+	return func(t *testing.T) {
+		invalidQueries := []string{"d=g", "fo=o", "k=v", "k=v&fo=o", "baz=foo"}
+
+		for _, invalidQuery := range invalidQueries {
+			resultingCode := http.StatusBadRequest
+			resultingBody := "Query should have the following elements: foo"
+
+			rec := httptest.NewRecorder()
+			req := httptest.NewRequest("GET", "/foo?"+invalidQuery, nil)
+
+			engine.ServeHTTP(rec, req)
+			body := rec.Body.String()
+
+			if rec.Code != resultingCode {
+				t.Errorf("Code should be '%d', got '%d'", resultingCode, rec.Code)
+			}
+			if !strings.Contains(body, resultingBody) {
+				t.Errorf("Returned body should have '%s', got '%s'", resultingBody, body)
 			}
 		}
 	}
