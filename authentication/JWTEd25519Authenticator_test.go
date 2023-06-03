@@ -1,10 +1,10 @@
 package authentication
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/d1360-64rc14/simple-api/config"
-	"github.com/d1360-64rc14/simple-api/interfaces"
 )
 
 var validSettings = &config.Auth{
@@ -64,41 +64,28 @@ func TestGenerateToken(t *testing.T) {
 }
 
 func TestTokenIsValid(t *testing.T) {
+	testingCauses := []struct {
+		token   string
+		isValid bool
+	}{
+		{isValid: true, token: "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWxAc2VydmVyLmNvbSIsImlkIjoxMjN9.L4CMw6zhZBrfPNs5QhPr3XebPqgKuf1ffi8QkYyK3WK9LoNN73p8bnt761PNykV4GOdJC3A3rqBnT33G1a6IBA"},
+		{isValid: false, token: "eyJhbGciOiJFRERTQSIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWxAc2VydmVyLmNvbSIsImlkIjoxMjN9.L4CMw6zhZBrfPNs5QhPr3XebPqgKuf1ffi8QkYyK3WK9LoNN73p8bnt761PNykV4GOdJC3A3rqBnT33G1a6IBA"},
+		{isValid: false, token: "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im00MWxAc2VydmVyLmNvbSIsImlkIjoxMjN9.L4CMw6zhZBrfPNs5QhPr3XebPqgKuf1ffi8QkYyK3WK9LoNN73p8bnt761PNykV4GOdJC3A3rqBnT33G1a6IBA"},
+		{isValid: false, token: "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWxAc2VydmVyLmNvbSIsImlkIjoxMjN9.L4CMw6zhZBrfPNs5QhPr3XebPqgKuf1ffi8QkYyK3WK9LoNN73p8bnt761PNykV4GOdJC3A3rqBnT33G1a6IBa"},
+	}
+
 	authenticator, err := NewJWTEd25519Authenticator(validSettings)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	t.Run("WithValidToken", testTokenIsValid_WithValidToken(authenticator))
-	t.Run("WithTamperedToken", testTokenIsValid_WithTamperedToken(authenticator))
-}
+	for i, cause := range testingCauses {
+		t.Run(fmt.Sprintf("token_%d", i), func(t *testing.T) {
+			valid := authenticator.IsTokenValid(cause.token)
 
-func testTokenIsValid_WithValidToken(authenticator interfaces.Authenticator) func(*testing.T) {
-	return func(t *testing.T) {
-		validToken := "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWxAc2VydmVyLmNvbSIsImlkIjoxMjN9.L4CMw6zhZBrfPNs5QhPr3XebPqgKuf1ffi8QkYyK3WK9LoNN73p8bnt761PNykV4GOdJC3A3rqBnT33G1a6IBA"
-
-		valid := authenticator.IsTokenValid(validToken)
-
-		if !valid {
-			t.Error("token should be valid, got invalid")
-		}
-	}
-}
-
-func testTokenIsValid_WithTamperedToken(authenticator interfaces.Authenticator) func(*testing.T) {
-	return func(t *testing.T) {
-		tamperedTokens := []string{
-			"eyJhbGciOiJFRERTQSIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWxAc2VydmVyLmNvbSIsImlkIjoxMjN9.L4CMw6zhZBrfPNs5QhPr3XebPqgKuf1ffi8QkYyK3WK9LoNN73p8bnt761PNykV4GOdJC3A3rqBnT33G1a6IBA",
-			"eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im00MWxAc2VydmVyLmNvbSIsImlkIjoxMjN9.L4CMw6zhZBrfPNs5QhPr3XebPqgKuf1ffi8QkYyK3WK9LoNN73p8bnt761PNykV4GOdJC3A3rqBnT33G1a6IBA",
-			"eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWxAc2VydmVyLmNvbSIsImlkIjoxMjN9.L4CMw6zhZBrfPNs5QhPr3XebPqgKuf1ffi8QkYyK3WK9LoNN73p8bnt761PNykV4GOdJC3A3rqBnT33G1a6IBa",
-		}
-
-		for _, tamperedToken := range tamperedTokens {
-			valid := authenticator.IsTokenValid(tamperedToken)
-
-			if valid {
-				t.Error("token should be invalid, got valid")
+			if valid != cause.isValid {
+				t.Errorf("Expected %t, got %t", cause.isValid, valid)
 			}
-		}
+		})
 	}
 }
