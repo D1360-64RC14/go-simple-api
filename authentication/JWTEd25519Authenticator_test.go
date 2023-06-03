@@ -34,12 +34,12 @@ func testNewJWTEd25519Authenticator_WithInvalidSeedLength(t *testing.T) {
 	}
 
 	defer func() {
-		rec := recover()
-		if rec == nil {
+		recov := recover()
+		if recov == nil {
 			t.Fatal("should panic 'bad seed length'")
 		}
-		if rec != nil && rec.(string) != "ed25519: bad seed length: 31" {
-			t.Fatalf("error should be 'ed25519: bad seed length: 31', got '%s'", rec.(string))
+		if recov != nil && recov.(string) != "ed25519: bad seed length: 31" {
+			t.Fatalf("error should be 'ed25519: bad seed length: 31', got '%s'", recov.(string))
 		}
 	}()
 
