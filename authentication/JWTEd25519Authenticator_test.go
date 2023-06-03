@@ -56,3 +56,31 @@ func TestGenerateToken(t *testing.T) {
 		t.Errorf("token should be '%s', got '%s'", resultToken, tokenStr)
 	}
 }
+
+func TestTokenIsValid_WithValidToken(t *testing.T) {
+	authenticator, err := NewJWTEd25519Authenticator(validSettings)
+	if err != nil {
+		t.Fatal(err)
+	}
+	validToken := "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWxAc2VydmVyLmNvbSIsImlkIjoxMjN9.L4CMw6zhZBrfPNs5QhPr3XebPqgKuf1ffi8QkYyK3WK9LoNN73p8bnt761PNykV4GOdJC3A3rqBnT33G1a6IBA"
+
+	valid := authenticator.IsTokenValid(validToken)
+
+	if valid != true {
+		t.Error("token should be valid, got invalid")
+	}
+}
+
+func TestTokenIsValid_WithTamperedToken(t *testing.T) {
+	authenticator, err := NewJWTEd25519Authenticator(validSettings)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tamperedToken := "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im00MWxAc2VydmVyLmNvbSIsImlkIjoxMjN9.L4CMw6zhZBrfPNs5QhPr3XebPqgKuf1ffi8QkYyK3WK9LoNN73p8bnt761PNykV4GOdJC3A3rqBnT33G1a6IBA"
+
+	valid := authenticator.IsTokenValid(tamperedToken)
+
+	if valid != false {
+		t.Error("token should be invalid, got valid")
+	}
+}
