@@ -79,7 +79,7 @@ func testTokenIsValid_WithValidToken(authenticator interfaces.Authenticator) fun
 
 		valid := authenticator.IsTokenValid(validToken)
 
-		if valid != true {
+		if !valid {
 			t.Error("token should be valid, got invalid")
 		}
 	}
@@ -96,7 +96,7 @@ func testTokenIsValid_WithTamperedToken(authenticator interfaces.Authenticator) 
 		for _, tamperedToken := range tamperedTokens {
 			valid := authenticator.IsTokenValid(tamperedToken)
 
-			if valid != false {
+			if valid {
 				t.Error("token should be invalid, got valid")
 			}
 		}
