@@ -1,9 +1,9 @@
 package validate
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -13,105 +13,79 @@ func init() {
 	gin.SetMode(gin.TestMode)
 }
 
-func TestQueryHave(t *testing.T) {
+func TestQueryHave_WithOneQuery(t *testing.T) {
+	testCases := []struct {
+		respCode int
+		query    string
+		respBody string
+	}{
+		{http.StatusOK, "foo=bar", "bar"},
+		{http.StatusOK, "foo=", ""},
+		{http.StatusOK, "foo=baz&d=g", "baz"},
+		{http.StatusOK, "foo=done&d=g&k=v", "done"},
+		{http.StatusBadRequest, "d=g", "{\"error\":\"Query should have the following elements: foo\"}"},
+		{http.StatusBadRequest, "fo=o", "{\"error\":\"Query should have the following elements: foo\"}"},
+		{http.StatusBadRequest, "k=v", "{\"error\":\"Query should have the following elements: foo\"}"},
+		{http.StatusBadRequest, "k=v&fo=o", "{\"error\":\"Query should have the following elements: foo\"}"},
+		{http.StatusBadRequest, "baz=foo", "{\"error\":\"Query should have the following elements: foo\"}"},
+	}
+
 	engine := gin.New()
 
-	engine.GET("/foo", QueryHave("foo"), func(ctx *gin.Context) {
+	engine.GET("/", QueryHave("foo"), func(ctx *gin.Context) {
 		ctx.String(http.StatusOK, ctx.Query("foo"))
 	})
-	engine.GET("/foobar", QueryHave("foo", "bar"), func(ctx *gin.Context) {
+
+	for i, _case := range testCases {
+		t.Run(fmt.Sprintf("token_%d", i), func(t *testing.T) {
+			rec := httptest.NewRecorder()
+			req := httptest.NewRequest("GET", "/?"+_case.query, nil)
+
+			engine.ServeHTTP(rec, req)
+			body := rec.Body.String()
+
+			if rec.Code != _case.respCode {
+				t.Errorf("Code should be '%d', got '%d'", _case.respCode, rec.Code)
+			}
+			if body != _case.respBody {
+				t.Errorf("Returned id should be '%s', got '%s'", _case.respBody, body)
+			}
+		})
+	}
+}
+
+func TestQueryHave_WithTwoQueries(t *testing.T) {
+	testCases := []struct {
+		respCode int
+		query    string
+		respBody string
+	}{
+		{http.StatusOK, "foo=bar&bar=foo", "barfoo"},
+		{http.StatusOK, "foo=&bar=", ""},
+		{http.StatusOK, "foo=baz&d=g&bar=none", "baznone"},
+		{http.StatusOK, "foo=done&d=g&k=v&bar=0", "done0"},
+	}
+
+	engine := gin.New()
+
+	engine.GET("/", QueryHave("foo", "bar"), func(ctx *gin.Context) {
 		ctx.String(http.StatusOK, ctx.Query("foo")+ctx.Query("bar"))
 	})
 
-	t.Run("WithFoo", testQueryHave_WithFoo(engine))
-	t.Run("WithFooBar", testQueryHave_WithFooBar(engine))
-	t.Run("WithoutFoo", testQueryHave_WithoutFoo(engine))
-}
-
-func testQueryHave_WithFoo(engine *gin.Engine) func(*testing.T) {
-	return func(t *testing.T) {
-		validQueries := []struct {
-			query string
-			body  string
-		}{
-			{query: "foo=bar", body: "bar"},
-			{query: "foo=", body: ""},
-			{query: "foo=baz&d=g", body: "baz"},
-			{query: "foo=done&d=g&k=v", body: "done"},
-		}
-
-		for _, validQuery := range validQueries {
-			resultingCode := http.StatusOK
-			resultingBody := validQuery.body
-
+	for i, _case := range testCases {
+		t.Run(fmt.Sprintf("token_%d", i), func(t *testing.T) {
 			rec := httptest.NewRecorder()
-			req := httptest.NewRequest("GET", "/foo?"+validQuery.query, nil)
+			req := httptest.NewRequest("GET", "/?"+_case.query, nil)
 
 			engine.ServeHTTP(rec, req)
 			body := rec.Body.String()
 
-			if rec.Code != resultingCode {
-				t.Errorf("Code should be '%d', got '%d'", resultingCode, rec.Code)
+			if rec.Code != _case.respCode {
+				t.Errorf("Code should be '%d', got '%d'", _case.respCode, rec.Code)
 			}
-			if body != resultingBody {
-				t.Errorf("Returned body should be '%s', got '%s'", resultingBody, body)
+			if body != _case.respBody {
+				t.Errorf("Returned id should be '%s', got '%s'", _case.respBody, body)
 			}
-		}
-	}
-}
-
-func testQueryHave_WithFooBar(engine *gin.Engine) func(*testing.T) {
-	return func(t *testing.T) {
-		validQueries := []struct {
-			query string
-			body  string
-		}{
-			{query: "foo=bar&bar=foo", body: "barfoo"},
-			{query: "foo=&bar=", body: ""},
-			{query: "foo=baz&d=g&bar=none", body: "baznone"},
-			{query: "foo=done&d=g&k=v&bar=0", body: "done0"},
-		}
-
-		for _, validQuery := range validQueries {
-			resultingCode := http.StatusOK
-			resultingBody := validQuery.body
-
-			rec := httptest.NewRecorder()
-			req := httptest.NewRequest("GET", "/foobar?"+validQuery.query, nil)
-
-			engine.ServeHTTP(rec, req)
-			body := rec.Body.String()
-
-			if rec.Code != resultingCode {
-				t.Errorf("Code should be '%d', got '%d'", resultingCode, rec.Code)
-			}
-			if body != resultingBody {
-				t.Errorf("Returned body should be '%s', got '%s'", resultingBody, body)
-			}
-		}
-	}
-}
-
-func testQueryHave_WithoutFoo(engine *gin.Engine) func(*testing.T) {
-	return func(t *testing.T) {
-		invalidQueries := []string{"d=g", "fo=o", "k=v", "k=v&fo=o", "baz=foo"}
-
-		for _, invalidQuery := range invalidQueries {
-			resultingCode := http.StatusBadRequest
-			resultingBody := "Query should have the following elements: foo"
-
-			rec := httptest.NewRecorder()
-			req := httptest.NewRequest("GET", "/foo?"+invalidQuery, nil)
-
-			engine.ServeHTTP(rec, req)
-			body := rec.Body.String()
-
-			if rec.Code != resultingCode {
-				t.Errorf("Code should be '%d', got '%d'", resultingCode, rec.Code)
-			}
-			if !strings.Contains(body, resultingBody) {
-				t.Errorf("Returned body should have '%s', got '%s'", resultingBody, body)
-			}
-		}
+		})
 	}
 }
