@@ -40,6 +40,12 @@ func (r *MockedUserRepository) CreateUser(user *dtos.UserWithHash) (*dtos.Identi
 		return nil, utils.NewErrorCodeString(http.StatusInternalServerError, "repository closed")
 	}
 
+	for _, u := range r.Users {
+		if u.Email == user.Email {
+			return nil, utils.NewErrorCodeString(http.StatusBadRequest, "email already exist")
+		}
+	}
+
 	r.IdCounter++
 
 	newUser := &dtos.IdentifiedUserWithHash{
