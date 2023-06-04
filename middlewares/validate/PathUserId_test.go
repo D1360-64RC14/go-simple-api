@@ -54,7 +54,7 @@ func TestPathUserId(t *testing.T) {
 				t.Errorf("Code should be '%d', got '%d'", _case.respCode, rec.Code)
 			}
 			if body != _case.respBody {
-				t.Errorf("Returned id should be '%s', got '%s'", _case.respBody, body)
+				t.Errorf("Returned body should be '%s', got '%s'", _case.respBody, body)
 			}
 		})
 	}
