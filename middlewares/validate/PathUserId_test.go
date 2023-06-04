@@ -43,7 +43,7 @@ func TestPathUserId(t *testing.T) {
 	})
 
 	for i, _case := range testCases {
-		t.Run(fmt.Sprintf("token_%d", i), func(t *testing.T) {
+		t.Run(fmt.Sprintf("case_%d", i), func(t *testing.T) {
 			rec := httptest.NewRecorder()
 			req := httptest.NewRequest("GET", "/"+_case.inputId, nil)
 

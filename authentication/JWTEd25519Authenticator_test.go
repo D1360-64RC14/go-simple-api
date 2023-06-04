@@ -80,7 +80,7 @@ func TestTokenIsValid(t *testing.T) {
 	}
 
 	for i, _case := range testCases {
-		t.Run(fmt.Sprintf("token_%d", i), func(t *testing.T) {
+		t.Run(fmt.Sprintf("case_%d", i), func(t *testing.T) {
 			valid := authenticator.IsTokenValid(_case.token)
 
 			if valid != _case.isValid {

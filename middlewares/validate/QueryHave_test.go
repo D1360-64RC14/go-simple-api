@@ -37,7 +37,7 @@ func TestQueryHave_WithOneQuery(t *testing.T) {
 	})
 
 	for i, _case := range testCases {
-		t.Run(fmt.Sprintf("token_%d", i), func(t *testing.T) {
+		t.Run(fmt.Sprintf("case_%d", i), func(t *testing.T) {
 			rec := httptest.NewRecorder()
 			req := httptest.NewRequest("GET", "/?"+_case.query, nil)
 
@@ -79,7 +79,7 @@ func TestQueryHave_WithTwoQueries(t *testing.T) {
 	})
 
 	for i, _case := range testCases {
-		t.Run(fmt.Sprintf("token_%d", i), func(t *testing.T) {
+		t.Run(fmt.Sprintf("case_%d", i), func(t *testing.T) {
 			rec := httptest.NewRecorder()
 			req := httptest.NewRequest("GET", "/?"+_case.query, nil)
 
