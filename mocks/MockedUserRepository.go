@@ -46,8 +46,6 @@ func (r *MockedUserRepository) CreateUser(user *dtos.UserWithHash) (*dtos.Identi
 		}
 	}
 
-	r.IdCounter++
-
 	newUser := &dtos.IdentifiedUserWithHash{
 		Hash: user.Hash,
 		IdentifiedUser: dtos.IdentifiedUser{
@@ -55,6 +53,8 @@ func (r *MockedUserRepository) CreateUser(user *dtos.UserWithHash) (*dtos.Identi
 			UserModel: user.UserModel,
 		},
 	}
+
+	r.IdCounter++
 
 	r.Users = append(r.Users, newUser)
 
