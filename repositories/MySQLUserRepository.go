@@ -11,14 +11,14 @@ import (
 )
 
 // DefaultUserRepository implements UserRepository
-var _ interfaces.UserRepository = (*DefaultUserRepository)(nil)
+var _ interfaces.UserRepository = (*MySQLUserRepository)(nil)
 
-type DefaultUserRepository struct {
+type MySQLUserRepository struct {
 	db *sql.DB
 }
 
-func NewDefaultUserRepository(database interfaces.Database) (interfaces.UserRepository, error) {
-	repo := &DefaultUserRepository{
+func NewMySQLUserRepository(database interfaces.Database) (interfaces.UserRepository, error) {
+	repo := &MySQLUserRepository{
 		db: database.DB(),
 	}
 
@@ -30,11 +30,11 @@ func NewDefaultUserRepository(database interfaces.Database) (interfaces.UserRepo
 	return repo, nil
 }
 
-func (r DefaultUserRepository) Close() error {
+func (r MySQLUserRepository) Close() error {
 	return r.db.Close()
 }
 
-func (r DefaultUserRepository) createUserTableIfNotExist() error {
+func (r MySQLUserRepository) createUserTableIfNotExist() error {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return err
@@ -63,7 +63,7 @@ func (r DefaultUserRepository) createUserTableIfNotExist() error {
 // transaction not beeing commited;
 // query not beeing sucessfully executed;
 // user just created not beeing found.
-func (r DefaultUserRepository) CreateUser(user *dtos.UserWithHash) (*dtos.IdentifiedUser, *utils.ErrorCode) {
+func (r MySQLUserRepository) CreateUser(user *dtos.UserWithHash) (*dtos.IdentifiedUser, *utils.ErrorCode) {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return nil, utils.NewErrorCode(http.StatusInternalServerError, err)
@@ -105,7 +105,7 @@ func (r DefaultUserRepository) CreateUser(user *dtos.UserWithHash) (*dtos.Identi
 //
 // Errors can be caused by:
 // id not beeing found.
-func (r DefaultUserRepository) SelectUserFromId(id int) (*dtos.IdentifiedUser, *utils.ErrorCode) {
+func (r MySQLUserRepository) SelectUserFromId(id int) (*dtos.IdentifiedUser, *utils.ErrorCode) {
 	row := r.db.QueryRow(`
 		SELECT
 			id,
@@ -134,7 +134,7 @@ func (r DefaultUserRepository) SelectUserFromId(id int) (*dtos.IdentifiedUser, *
 // SelectUserFromEmail returns the identified user from their email.
 //
 // Errors can be caused by:
-func (r DefaultUserRepository) SelectUserFromEmail(email string) (*dtos.IdentifiedUser, *utils.ErrorCode) {
+func (r MySQLUserRepository) SelectUserFromEmail(email string) (*dtos.IdentifiedUser, *utils.ErrorCode) {
 	row := r.db.QueryRow(`
 		SELECT
 			id,
@@ -164,7 +164,7 @@ func (r DefaultUserRepository) SelectUserFromEmail(email string) (*dtos.Identifi
 //
 // Errors can be caused by:
 // id not beeing found.
-func (r DefaultUserRepository) SelectUserHashFromId(id int) (string, *utils.ErrorCode) {
+func (r MySQLUserRepository) SelectUserHashFromId(id int) (string, *utils.ErrorCode) {
 	row := r.db.QueryRow(`
 		SELECT
 			hash,
@@ -192,7 +192,7 @@ func (r DefaultUserRepository) SelectUserHashFromId(id int) (string, *utils.Erro
 //
 // Errors can be caused by:
 // id not beeing found.
-func (r DefaultUserRepository) SelectCompleteUserFromId(id int) (*dtos.IdentifiedUserWithHash, *utils.ErrorCode) {
+func (r MySQLUserRepository) SelectCompleteUserFromId(id int) (*dtos.IdentifiedUserWithHash, *utils.ErrorCode) {
 	row := r.db.QueryRow(`
 		SELECT
 			id,
@@ -224,7 +224,7 @@ func (r DefaultUserRepository) SelectCompleteUserFromId(id int) (*dtos.Identifie
 // Errors can be caused by:
 // query not beeing successfully executed;
 // row beeing read wrongly.
-func (r DefaultUserRepository) SelectAllUsers() ([]*dtos.IdentifiedUser, *utils.ErrorCode) {
+func (r MySQLUserRepository) SelectAllUsers() ([]*dtos.IdentifiedUser, *utils.ErrorCode) {
 	row := r.db.QueryRow(`
 		SELECT
 			count(id)
@@ -278,7 +278,7 @@ func (r DefaultUserRepository) SelectAllUsers() ([]*dtos.IdentifiedUser, *utils.
 // transaction not beeing commited;
 // more than 1 user beeing found;
 // fail to get number of affected rows.
-func (r DefaultUserRepository) RemoveUser(id int) *utils.ErrorCode {
+func (r MySQLUserRepository) RemoveUser(id int) *utils.ErrorCode {
 	transaction, err := r.db.Begin()
 	if err != nil {
 		return utils.NewErrorCode(http.StatusInternalServerError, err)
@@ -319,7 +319,7 @@ func (r DefaultUserRepository) RemoveUser(id int) *utils.ErrorCode {
 //
 // Errors can be caused by:
 // query failing.
-func (r DefaultUserRepository) UserExist(id int) (bool, *utils.ErrorCode) {
+func (r MySQLUserRepository) UserExist(id int) (bool, *utils.ErrorCode) {
 	row := r.db.QueryRow(`
 		SELECT EXISTS (
 			SELECT
@@ -345,7 +345,7 @@ func (r DefaultUserRepository) UserExist(id int) (bool, *utils.ErrorCode) {
 	return userExist, nil
 }
 
-func (r DefaultUserRepository) UpdateUsername(id int, newUsername string) *utils.ErrorCode {
+func (r MySQLUserRepository) UpdateUsername(id int, newUsername string) *utils.ErrorCode {
 	transaction, err := r.db.Begin()
 	if err != nil {
 		return utils.NewErrorCode(http.StatusInternalServerError, err)

@@ -23,7 +23,7 @@ func main() {
 	authenticator, err := authentication.NewJWTEd25519Authenticator(&settings.Auth)
 	fatalErr(err)
 
-	userRepo, err := repositories.NewDefaultUserRepository(database)
+	userRepo, err := repositories.NewMySQLUserRepository(database)
 	fatalErr(err)
 
 	userService := services.NewDefaultUserService(userRepo, authenticator, settings)
