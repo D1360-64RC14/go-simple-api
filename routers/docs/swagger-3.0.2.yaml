@@ -207,6 +207,13 @@ components:
         - "username"
         - "email"
         - "password"
+    "LoginRequest":
+      type: object
+      properties:
+        "email":
+          $ref: "#/components/schemas/UserEmail"
+        "password":
+          $ref: "#/components/schemas/UserPassword"
     "TokenResponse":
       type: object
       properties:
