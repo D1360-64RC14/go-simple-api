@@ -211,3 +211,9 @@ components:
         - "username"
         - "email"
         - "password"
+    "TokenResponse":
+      type: object
+      properties:
+        "token":
+          allOf:
+            - $ref: "#/components/schemas/JWTString"
