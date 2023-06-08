@@ -68,7 +68,6 @@ func (r MySQLUserRepository) CreateUser(user *dtos.UserWithHash) (*dtos.Identifi
 	if err != nil {
 		return nil, utils.NewErrorCode(http.StatusInternalServerError, err)
 	}
-	defer transaction.Commit()
 
 	_, err = transaction.Exec(`
 		INSERT INTO users(username, email, hash)
@@ -91,6 +90,11 @@ func (r MySQLUserRepository) CreateUser(user *dtos.UserWithHash) (*dtos.Identifi
 
 	var id int
 	err = row.Scan(&id)
+	if err != nil {
+		return nil, utils.NewErrorCode(http.StatusInternalServerError, err)
+	}
+
+	err = transaction.Commit()
 	if err != nil {
 		return nil, utils.NewErrorCode(http.StatusInternalServerError, err)
 	}
