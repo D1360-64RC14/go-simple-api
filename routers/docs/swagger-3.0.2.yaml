@@ -188,10 +188,9 @@ components:
       type: object
       properties:
         "username":
-          type: string
+          $ref: "#/components/schemas/UserName"
         "email":
-          type: string
-          format: email
+          $ref: "#/components/schemas/UserEmail"
     "IdentifiedUser":
         type: object
         allOf:
@@ -200,13 +199,10 @@ components:
     "UserWithPassword":
       type: object
       allOf:
-          - $ref: "#/components/schemas/UserModel"
+        - $ref: "#/components/schemas/UserModel"
       properties:
         "password":
-          type: string
-          format: password
-          maxLength: 72
-          minLength: 8
+          $ref: "#/components/schemas/UserPassword"
       required:
         - "username"
         - "email"
@@ -215,5 +211,4 @@ components:
       type: object
       properties:
         "token":
-          allOf:
-            - $ref: "#/components/schemas/JWTString"
+          $ref: "#/components/schemas/JWTString"
