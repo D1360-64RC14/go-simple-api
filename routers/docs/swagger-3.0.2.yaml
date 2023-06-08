@@ -214,6 +214,9 @@ components:
           $ref: "#/components/schemas/UserEmail"
         "password":
           $ref: "#/components/schemas/UserPassword"
+      required:
+        - "email"
+        - "password"
     "TokenResponse":
       type: object
       properties:
