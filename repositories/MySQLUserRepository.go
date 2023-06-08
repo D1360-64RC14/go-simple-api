@@ -358,6 +358,14 @@ func (r MySQLUserRepository) UserExist(id int) (bool, *utils.ErrorCode) {
 	return userExist, nil
 }
 
+// UpdateUsername changes the username for the given id.
+//
+// Will rollback if more than one user get updated.
+//
+// Errors can be caused by:
+// transaction not being started;
+// transaction not being commited;
+// query not being sucessfully executed.
 func (r MySQLUserRepository) UpdateUsername(id int, newUsername string) *utils.ErrorCode {
 	transaction, err := r.db.Begin()
 	if err != nil {
