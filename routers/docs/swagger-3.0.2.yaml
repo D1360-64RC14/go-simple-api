@@ -168,6 +168,11 @@ components:
     "UserId":
       type: integer
       format: int32
+    "UserPassword":
+      type: string
+      format: password
+      maxLength: 72
+      minLength: 8
     "UserModel":
       type: object
       properties:
