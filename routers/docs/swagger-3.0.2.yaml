@@ -181,6 +181,9 @@ components:
       type: string
       minLength: 3
       maxLength: 50
+    "JWTString":
+      type: string
+      format: jwt
     "UserModel":
       type: object
       properties:
