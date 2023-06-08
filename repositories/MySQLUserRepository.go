@@ -226,8 +226,10 @@ func (r MySQLUserRepository) SelectCompleteUserFromId(id int) (*dtos.IdentifiedU
 // SelectAllUsers returns a list of all users from database.
 //
 // Errors can be caused by:
-// query not beeing successfully executed;
-// row beeing read wrongly.
+// user count query not beeing successfully executed;
+// no rows being found at user count;
+// row beeing read wrongly;
+// no content being found at some row.
 func (r MySQLUserRepository) SelectAllUsers() ([]*dtos.IdentifiedUser, *utils.ErrorCode) {
 	row := r.db.QueryRow(`
 		SELECT
