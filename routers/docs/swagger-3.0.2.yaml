@@ -157,6 +157,7 @@ paths:
           description: The last password was incorrect
         "404":
           description: User ID was not found in the database
+
   "/user/login":
     post:
       description: Login the user receiving their authentication token
@@ -172,6 +173,10 @@ paths:
           content:
             "application/json":
               schema: { $ref: "#/components/schemas/TokenResponse" }
+        "404":
+          description: User not found in the database
+        "401":
+          description: Invalid user password
 
 components:
   schemas:
