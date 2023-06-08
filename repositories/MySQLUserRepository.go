@@ -134,6 +134,8 @@ func (r MySQLUserRepository) SelectUserFromId(id int) (*dtos.IdentifiedUser, *ut
 // SelectUserFromEmail returns the identified user from their email.
 //
 // Errors can be caused by:
+// query not beeing sucessfully executed;
+// no rows being found.
 func (r MySQLUserRepository) SelectUserFromEmail(email string) (*dtos.IdentifiedUser, *utils.ErrorCode) {
 	row := r.db.QueryRow(`
 		SELECT
