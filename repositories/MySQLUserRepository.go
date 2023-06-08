@@ -194,6 +194,7 @@ func (r MySQLUserRepository) SelectUserHashFromId(id int) (string, *utils.ErrorC
 // SelectCompleteUserFromId reutrns all user info from database.
 //
 // Errors can be caused by:
+// query not beeing sucessfully executed;
 // id not beeing found.
 func (r MySQLUserRepository) SelectCompleteUserFromId(id int) (*dtos.IdentifiedUserWithHash, *utils.ErrorCode) {
 	row := r.db.QueryRow(`
