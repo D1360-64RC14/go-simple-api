@@ -173,6 +173,10 @@ components:
       format: password
       maxLength: 72
       minLength: 8
+    "UserEmail":
+      type: string
+      format: email
+      maxLength: 100
     "UserModel":
       type: object
       properties:
