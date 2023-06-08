@@ -177,6 +177,10 @@ components:
       type: string
       format: email
       maxLength: 100
+    "UserName":
+      type: string
+      minLength: 3
+      maxLength: 50
     "UserModel":
       type: object
       properties:
