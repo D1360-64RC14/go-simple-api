@@ -283,6 +283,8 @@ func (r MySQLUserRepository) SelectAllUsers() ([]*dtos.IdentifiedUser, *utils.Er
 
 // RemoveUser removes an user from the database.
 //
+// Will rollback if more than one user get removed.
+//
 // Errors can be caused by:
 // transaction not being started;
 // transaction not being commited;
