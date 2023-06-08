@@ -165,6 +165,7 @@ func (r MySQLUserRepository) SelectUserFromEmail(email string) (*dtos.Identified
 // SelectUserHashFromId returns the user password hash from database.
 //
 // Errors can be caused by:
+// query not beeing sucessfully executed;
 // id not beeing found.
 func (r MySQLUserRepository) SelectUserHashFromId(id int) (string, *utils.ErrorCode) {
 	row := r.db.QueryRow(`
