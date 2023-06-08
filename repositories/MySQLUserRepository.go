@@ -328,7 +328,8 @@ func (r MySQLUserRepository) RemoveUser(id int) *utils.ErrorCode {
 // UserExist checks if an user with given id is present in the database.
 //
 // Errors can be caused by:
-// query failing.
+// query not beeing sucessfully executed;
+// no rows being found.
 func (r MySQLUserRepository) UserExist(id int) (bool, *utils.ErrorCode) {
 	row := r.db.QueryRow(`
 		SELECT EXISTS (
