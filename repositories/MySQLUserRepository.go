@@ -64,13 +64,13 @@ func (r MySQLUserRepository) createUserTableIfNotExist() error {
 // query not being sucessfully executed;
 // user just created not being found.
 func (r MySQLUserRepository) CreateUser(user *dtos.UserWithHash) (*dtos.IdentifiedUser, *utils.ErrorCode) {
-	tx, err := r.db.Begin()
+	transaction, err := r.db.Begin()
 	if err != nil {
 		return nil, utils.NewErrorCode(http.StatusInternalServerError, err)
 	}
-	defer tx.Commit()
+	defer transaction.Commit()
 
-	_, err = tx.Exec(`
+	_, err = transaction.Exec(`
 		INSERT INTO users(username, email, hash)
 		VALUES (?, ?, ?);
 	`, user.UserName, user.Email, user.Hash)
@@ -78,7 +78,7 @@ func (r MySQLUserRepository) CreateUser(user *dtos.UserWithHash) (*dtos.Identifi
 		return nil, utils.NewErrorCodeString(http.StatusConflict, "Email address already exist")
 	}
 
-	row := tx.QueryRow(`
+	row := transaction.QueryRow(`
 		SELECT
 			id
 		FROM
