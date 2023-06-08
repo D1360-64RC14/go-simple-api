@@ -240,7 +240,11 @@ func (r MySQLUserRepository) SelectAllUsers() ([]*dtos.IdentifiedUser, *utils.Er
 	}
 
 	var userCount int
-	row.Scan(&userCount)
+
+	err := row.Scan(&userCount)
+	if err != nil {
+		return nil, utils.NewErrorCode(http.StatusInternalServerError, err)
+	}
 
 	rows, err := r.db.Query(`
 		SELECT
