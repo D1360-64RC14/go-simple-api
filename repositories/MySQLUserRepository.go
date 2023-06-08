@@ -59,10 +59,10 @@ func (r MySQLUserRepository) createUserTableIfNotExist() error {
 // CreateUser adds a new user to the database, returning an identified user.
 //
 // Errors can be caused by:
-// transaction not beeing started;
-// transaction not beeing commited;
-// query not beeing sucessfully executed;
-// user just created not beeing found.
+// transaction not being started;
+// transaction not being commited;
+// query not being sucessfully executed;
+// user just created not being found.
 func (r MySQLUserRepository) CreateUser(user *dtos.UserWithHash) (*dtos.IdentifiedUser, *utils.ErrorCode) {
 	tx, err := r.db.Begin()
 	if err != nil {
@@ -104,7 +104,7 @@ func (r MySQLUserRepository) CreateUser(user *dtos.UserWithHash) (*dtos.Identifi
 // SelectUserFromId returns the user with their id.
 //
 // Errors can be caused by:
-// id not beeing found.
+// id not being found.
 func (r MySQLUserRepository) SelectUserFromId(id int) (*dtos.IdentifiedUser, *utils.ErrorCode) {
 	row := r.db.QueryRow(`
 		SELECT
@@ -134,7 +134,7 @@ func (r MySQLUserRepository) SelectUserFromId(id int) (*dtos.IdentifiedUser, *ut
 // SelectUserFromEmail returns the identified user from their email.
 //
 // Errors can be caused by:
-// query not beeing sucessfully executed;
+// query not being sucessfully executed;
 // no rows being found.
 func (r MySQLUserRepository) SelectUserFromEmail(email string) (*dtos.IdentifiedUser, *utils.ErrorCode) {
 	row := r.db.QueryRow(`
@@ -165,8 +165,8 @@ func (r MySQLUserRepository) SelectUserFromEmail(email string) (*dtos.Identified
 // SelectUserHashFromId returns the user password hash from database.
 //
 // Errors can be caused by:
-// query not beeing sucessfully executed;
-// id not beeing found.
+// query not being sucessfully executed;
+// id not being found.
 func (r MySQLUserRepository) SelectUserHashFromId(id int) (string, *utils.ErrorCode) {
 	row := r.db.QueryRow(`
 		SELECT
@@ -194,8 +194,8 @@ func (r MySQLUserRepository) SelectUserHashFromId(id int) (string, *utils.ErrorC
 // SelectCompleteUserFromId reutrns all user info from database.
 //
 // Errors can be caused by:
-// query not beeing sucessfully executed;
-// id not beeing found.
+// query not being sucessfully executed;
+// id not being found.
 func (r MySQLUserRepository) SelectCompleteUserFromId(id int) (*dtos.IdentifiedUserWithHash, *utils.ErrorCode) {
 	row := r.db.QueryRow(`
 		SELECT
@@ -226,9 +226,9 @@ func (r MySQLUserRepository) SelectCompleteUserFromId(id int) (*dtos.IdentifiedU
 // SelectAllUsers returns a list of all users from database.
 //
 // Errors can be caused by:
-// user count query not beeing successfully executed;
+// user count query not being successfully executed;
 // no rows being found at user count;
-// row beeing read wrongly;
+// row being read wrongly;
 // no content being found at some row.
 func (r MySQLUserRepository) SelectAllUsers() ([]*dtos.IdentifiedUser, *utils.ErrorCode) {
 	row := r.db.QueryRow(`
@@ -284,9 +284,9 @@ func (r MySQLUserRepository) SelectAllUsers() ([]*dtos.IdentifiedUser, *utils.Er
 // RemoveUser removes an user from the database.
 //
 // Errors can be caused by:
-// transaction not beeing started;
-// transaction not beeing commited;
-// more than 1 user beeing found;
+// transaction not being started;
+// transaction not being commited;
+// more than 1 user being found;
 // fail to get number of affected rows.
 func (r MySQLUserRepository) RemoveUser(id int) *utils.ErrorCode {
 	transaction, err := r.db.Begin()
@@ -328,7 +328,7 @@ func (r MySQLUserRepository) RemoveUser(id int) *utils.ErrorCode {
 // UserExist checks if an user with given id is present in the database.
 //
 // Errors can be caused by:
-// query not beeing sucessfully executed;
+// query not being sucessfully executed;
 // no rows being found.
 func (r MySQLUserRepository) UserExist(id int) (bool, *utils.ErrorCode) {
 	row := r.db.QueryRow(`
