@@ -13,6 +13,7 @@ import (
 	"github.com/d1360-64rc14/simple-api/models"
 	"github.com/d1360-64rc14/simple-api/services"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func init() {
@@ -26,7 +27,7 @@ var settings = config.Settings{
 	},
 	Auth: config.Auth{
 		Base64TokenSeed: "IXRoZXF1aWNrZm94anVtcHNvdmVydGhlbGF6eWRvZyE",
-		BCryptCost:      12,
+		BCryptCost:      bcrypt.MinCost,
 	},
 }
 
