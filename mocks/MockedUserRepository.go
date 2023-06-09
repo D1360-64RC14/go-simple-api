@@ -26,6 +26,14 @@ func NewMockedUserRepository() *MockedUserRepository {
 	}
 }
 
+func NewMockedUserRepositoryWith(users []*dtos.IdentifiedUserWithHash) *MockedUserRepository {
+	return &MockedUserRepository{
+		IdCounter: 0,
+		Closed:    false,
+		Users:     users,
+	}
+}
+
 func (r *MockedUserRepository) Close() error {
 	if r.Closed {
 		return errors.New("already closed")
