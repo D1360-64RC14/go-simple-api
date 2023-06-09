@@ -177,3 +177,54 @@ func TestCreateSingleUser(t *testing.T) {
 		})
 	}
 }
+
+func TestGetUser(t *testing.T) {
+	testCases := []struct {
+		userId   string
+		respCode int
+		respBody string
+	}{
+		{"0", http.StatusOK, `{"id":0,"username":"diego","email":"diego@mail.com"}`},
+		{"5", http.StatusOK, `{"id":5,"username":"alex","email":"alex@mail.com"}`},
+		{"2", http.StatusOK, `{"id":2,"username":"R2D2","email":"r2d2@mail.com"}`},
+		{"4", http.StatusOK, `{"id":4,"username":"any","email":"any@mail.com"}`},
+		{"3", http.StatusNotFound, ""},
+		{"6", http.StatusNotFound, ""},
+		{"7", http.StatusNotFound, ""},
+		{"9", http.StatusNotFound, ""},
+		{"-5", http.StatusNotFound, ""},
+		{"10", http.StatusNotFound, ""},
+	}
+
+	users := []*dtos.IdentifiedUserWithHash{
+		{IdentifiedUser: dtos.IdentifiedUser{ID: 0, UserModel: models.UserModel{UserName: "diego", Email: "diego@mail.com"}}, Hash: "fb78ed1e-a121-542f-a68d-fcd21ffe83c5"},
+		{IdentifiedUser: dtos.IdentifiedUser{ID: 5, UserModel: models.UserModel{UserName: "alex", Email: "alex@mail.com"}}, Hash: "d296ee89-edba-58c6-8745-d45557cefb90"},
+		{IdentifiedUser: dtos.IdentifiedUser{ID: 2, UserModel: models.UserModel{UserName: "R2D2", Email: "r2d2@mail.com"}}, Hash: "621d7d27-1730-59fc-b989-8c4de8d34cd9"},
+		{IdentifiedUser: dtos.IdentifiedUser{ID: 4, UserModel: models.UserModel{UserName: "any", Email: "any@mail.com"}}, Hash: "4b91a84b-8d29-5c05-bf9b-cc0e03d4df82"},
+	}
+
+	userRepo := mocks.NewMockedUserRepositoryWith(6, users)
+	userService := services.NewDefaultUserService(userRepo, authenticator, &settings)
+
+	controller := NewDefaultUserController(userService, userRepo, &settings)
+
+	engine := gin.New()
+	controller.AttachTo(&engine.RouterGroup)
+
+	for i, _case := range testCases {
+		t.Run(fmt.Sprintf("case_%d", i), func(t *testing.T) {
+			rec := httptest.NewRecorder()
+			req := httptest.NewRequest("GET", "/user/"+_case.userId, nil)
+
+			engine.ServeHTTP(rec, req)
+			body := rec.Body.String()
+
+			if rec.Code != _case.respCode {
+				t.Errorf("Returned code should be '%d', got '%d'", _case.respCode, rec.Code)
+			}
+			if body != _case.respBody {
+				t.Errorf("Returned body should be '%s', got '%s'", _case.respBody, body)
+			}
+		})
+	}
+}
