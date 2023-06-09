@@ -26,9 +26,9 @@ func NewMockedUserRepository() *MockedUserRepository {
 	}
 }
 
-func NewMockedUserRepositoryWith(users []*dtos.IdentifiedUserWithHash) *MockedUserRepository {
+func NewMockedUserRepositoryWith(idCounter int, users []*dtos.IdentifiedUserWithHash) *MockedUserRepository {
 	return &MockedUserRepository{
-		IdCounter: 0,
+		IdCounter: idCounter,
 		Closed:    false,
 		Users:     users,
 	}
