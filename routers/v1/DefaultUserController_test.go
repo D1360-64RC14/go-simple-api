@@ -32,38 +32,39 @@ var authenticator = mocks.NewMockedAuthenticator()
 
 func TestListAllUsers(t *testing.T) {
 	testCases := []struct {
-		usersToAdd []dtos.UserWithHash
+		usersToAdd []*dtos.IdentifiedUserWithHash
 		respBody   string
 	}{
 		{
-			[]dtos.UserWithHash{},
+			[]*dtos.IdentifiedUserWithHash{},
 			"[]",
 		},
 		{
-			[]dtos.UserWithHash{
-				{UserModel: models.UserModel{UserName: "diego", Email: "diego@mail.com"}, Hash: "fb78ed1e-a121-542f-a68d-fcd21ffe83c5"},
+			[]*dtos.IdentifiedUserWithHash{
+				{IdentifiedUser: dtos.IdentifiedUser{ID: 0, UserModel: models.UserModel{UserName: "diego", Email: "diego@mail.com"}}, Hash: "fb78ed1e-a121-542f-a68d-fcd21ffe83c5"},
 			},
 			`[{"id":0,"username":"diego","email":"diego@mail.com"}]`,
 		},
 		{
-			[]dtos.UserWithHash{
-				{UserModel: models.UserModel{UserName: "diego", Email: "diego@mail.com"}, Hash: "fb78ed1e-a121-542f-a68d-fcd21ffe83c5"},
-				{UserModel: models.UserModel{UserName: "alex", Email: "alex@mail.com"}, Hash: "d296ee89-edba-58c6-8745-d45557cefb90"},
+			[]*dtos.IdentifiedUserWithHash{
+				{IdentifiedUser: dtos.IdentifiedUser{ID: 0, UserModel: models.UserModel{UserName: "diego", Email: "diego@mail.com"}}, Hash: "fb78ed1e-a121-542f-a68d-fcd21ffe83c5"},
+				{IdentifiedUser: dtos.IdentifiedUser{ID: 5, UserModel: models.UserModel{UserName: "alex", Email: "alex@mail.com"}}, Hash: "d296ee89-edba-58c6-8745-d45557cefb90"},
 			},
-			`[{"id":0,"username":"diego","email":"diego@mail.com"},{"id":1,"username":"alex","email":"alex@mail.com"}]`,
+			`[{"id":0,"username":"diego","email":"diego@mail.com"},{"id":5,"username":"alex","email":"alex@mail.com"}]`,
+		},
+		{
+			[]*dtos.IdentifiedUserWithHash{
+				{IdentifiedUser: dtos.IdentifiedUser{ID: 0, UserModel: models.UserModel{UserName: "diego", Email: "diego@mail.com"}}, Hash: "fb78ed1e-a121-542f-a68d-fcd21ffe83c5"},
+				{IdentifiedUser: dtos.IdentifiedUser{ID: 5, UserModel: models.UserModel{UserName: "alex", Email: "alex@mail.com"}}, Hash: "d296ee89-edba-58c6-8745-d45557cefb90"},
+				{IdentifiedUser: dtos.IdentifiedUser{ID: 2, UserModel: models.UserModel{UserName: "R2D2", Email: "r2d2@mail.com"}}, Hash: "621d7d27-1730-59fc-b989-8c4de8d34cd9"},
+			},
+			`[{"id":0,"username":"diego","email":"diego@mail.com"},{"id":5,"username":"alex","email":"alex@mail.com"},{"id":2,"username":"R2D2","email":"r2d2@mail.com"}]`,
 		},
 	}
 
 	for i, _case := range testCases {
 		t.Run(fmt.Sprintf("case_%d", i), func(t *testing.T) {
-			userRepo := mocks.NewMockedUserRepository()
-
-			for _, user := range _case.usersToAdd {
-				if _, err := userRepo.CreateUser(&user); err != nil {
-					t.Fatalf("userRepo.CreateUser returned an error: (%d) %s", err.Code(), err.Error())
-				}
-			}
-
+			userRepo := mocks.NewMockedUserRepositoryWith(_case.usersToAdd)
 			userService := services.NewDefaultUserService(userRepo, authenticator, &settings)
 
 			controller := NewDefaultUserController(userService, userRepo, &settings)
