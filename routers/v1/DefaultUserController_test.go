@@ -99,6 +99,7 @@ func TestCreateSingleUser(t *testing.T) {
 		postBody  string
 		respCode  int
 		respBody  string
+		location  string
 	}{
 		{
 			[]*dtos.IdentifiedUserWithHash{},
@@ -106,6 +107,7 @@ func TestCreateSingleUser(t *testing.T) {
 			`{"username": "diego", "email": "diego@mail.com", "password": "d1360@m41l.c0m"}`,
 			http.StatusCreated,
 			`{"id":0,"username":"diego","email":"diego@mail.com"}`,
+			fmt.Sprintf("%s://%s/user/0", settings.Api.Protocol, settings.Api.BaseUrl),
 		},
 		{
 			[]*dtos.IdentifiedUserWithHash{
@@ -115,6 +117,7 @@ func TestCreateSingleUser(t *testing.T) {
 			`{"username": "alex", "email": "alex@mail.com", "password": "4l3x@m41l.c0m"}`,
 			http.StatusCreated,
 			`{"id":1,"username":"alex","email":"alex@mail.com"}`,
+			fmt.Sprintf("%s://%s/user/1", settings.Api.Protocol, settings.Api.BaseUrl),
 		},
 		{
 			[]*dtos.IdentifiedUserWithHash{
@@ -125,6 +128,7 @@ func TestCreateSingleUser(t *testing.T) {
 			`{"username": "R2D2", "email": "r2d2@mail.com", "password": "r2d2@m41l.c0m"}`,
 			http.StatusCreated,
 			`{"id":6,"username":"R2D2","email":"r2d2@mail.com"}`,
+			fmt.Sprintf("%s://%s/user/6", settings.Api.Protocol, settings.Api.BaseUrl),
 		},
 		{
 			[]*dtos.IdentifiedUserWithHash{
@@ -136,6 +140,7 @@ func TestCreateSingleUser(t *testing.T) {
 			`{"username": "R2D2", "email": "r2d2@mail.com", "password": "r2d2@m41l.c0m"}`,
 			http.StatusConflict,
 			`{"error":"email already exist"}`,
+			"",
 		},
 	}
 
@@ -155,6 +160,7 @@ func TestCreateSingleUser(t *testing.T) {
 
 			engine.ServeHTTP(rec, req)
 			body := rec.Body.String()
+			location := rec.Header().Get("Location")
 
 			if rec.Code != _case.respCode {
 				t.Errorf("Returned code should be '%d', not '%d'", _case.respCode, rec.Code)
@@ -162,6 +168,10 @@ func TestCreateSingleUser(t *testing.T) {
 
 			if body != _case.respBody {
 				t.Errorf("Returned body should be '%s', got '%s'", _case.respBody, body)
+			}
+
+			if location != _case.location {
+				t.Errorf("Returned header Location should be '%s', got '%s'", _case.location, location)
 			}
 		})
 	}
