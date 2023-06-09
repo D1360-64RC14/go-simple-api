@@ -50,7 +50,7 @@ func (r *MockedUserRepository) CreateUser(user *dtos.UserWithHash) (*dtos.Identi
 
 	for _, u := range r.Users {
 		if u.Email == user.Email {
-			return nil, utils.NewErrorCodeString(http.StatusBadRequest, "email already exist")
+			return nil, utils.NewErrorCodeString(http.StatusConflict, "email already exist")
 		}
 	}
 
