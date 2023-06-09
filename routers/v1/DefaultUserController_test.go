@@ -237,3 +237,11 @@ func TestGetUser(t *testing.T) {
 		})
 	}
 }
+
+func TestDeleteUser(t *testing.T) {
+	testCases := []struct {
+		usersInDB   []*dtos.IdentifiedUserWithHash
+		idsToDelete []int
+		respCode    int
+	}{}
+}
