@@ -163,7 +163,7 @@ func TestCreateSingleUser(t *testing.T) {
 			location := rec.Header().Get("Location")
 
 			if rec.Code != _case.respCode {
-				t.Errorf("Returned code should be '%d', not '%d'", _case.respCode, rec.Code)
+				t.Errorf("Returned code should be '%d', got '%d'", _case.respCode, rec.Code)
 			}
 
 			if body != _case.respBody {
