@@ -2,6 +2,7 @@ package v1
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -180,20 +181,20 @@ func TestCreateSingleUser(t *testing.T) {
 
 func TestGetUser(t *testing.T) {
 	testCases := []struct {
-		userId   string
+		userId   int
 		respCode int
 		respBody string
 	}{
-		{"0", http.StatusOK, `{"id":0,"username":"diego","email":"diego@mail.com"}`},
-		{"5", http.StatusOK, `{"id":5,"username":"alex","email":"alex@mail.com"}`},
-		{"2", http.StatusOK, `{"id":2,"username":"R2D2","email":"r2d2@mail.com"}`},
-		{"4", http.StatusOK, `{"id":4,"username":"any","email":"any@mail.com"}`},
-		{"3", http.StatusNotFound, ""},
-		{"6", http.StatusNotFound, ""},
-		{"7", http.StatusNotFound, ""},
-		{"9", http.StatusNotFound, ""},
-		{"-5", http.StatusNotFound, ""},
-		{"10", http.StatusNotFound, ""},
+		{0, http.StatusOK, `{"id":0,"username":"diego","email":"diego@mail.com"}`},
+		{5, http.StatusOK, `{"id":5,"username":"alex","email":"alex@mail.com"}`},
+		{2, http.StatusOK, `{"id":2,"username":"R2D2","email":"r2d2@mail.com"}`},
+		{4, http.StatusOK, `{"id":4,"username":"any","email":"any@mail.com"}`},
+		{3, http.StatusNotFound, ""},
+		{6, http.StatusNotFound, ""},
+		{7, http.StatusNotFound, ""},
+		{9, http.StatusNotFound, ""},
+		{-5, http.StatusNotFound, ""},
+		{10, http.StatusNotFound, ""},
 	}
 
 	users := []*dtos.IdentifiedUserWithHash{
@@ -214,14 +215,22 @@ func TestGetUser(t *testing.T) {
 	for i, _case := range testCases {
 		t.Run(fmt.Sprintf("case_%d", i), func(t *testing.T) {
 			rec := httptest.NewRecorder()
-			req := httptest.NewRequest("GET", "/user/"+_case.userId, nil)
+			req := httptest.NewRequest("GET", "/user/"+fmt.Sprint(_case.userId), nil)
 
 			engine.ServeHTTP(rec, req)
 			body := rec.Body.String()
 
+			var user dtos.IdentifiedUser
+			json.Unmarshal(rec.Body.Bytes(), &user)
+
+			if body != "" && user.ID != _case.userId {
+				t.Errorf("ID in body should be '%d' got '%d'", _case.userId, user.ID)
+			}
+
 			if rec.Code != _case.respCode {
 				t.Errorf("Returned code should be '%d', got '%d'", _case.respCode, rec.Code)
 			}
+
 			if body != _case.respBody {
 				t.Errorf("Returned body should be '%s', got '%s'", _case.respBody, body)
 			}
