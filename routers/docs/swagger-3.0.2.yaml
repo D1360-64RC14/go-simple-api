@@ -215,7 +215,9 @@ components:
         type: object
         allOf:
           - $ref: "#/components/schemas/UserModel"
-          - $ref: "#/components/schemas/UserId"
+        properties:
+          "id":
+            $ref: "#/components/schemas/UserId"
     "UserWithPassword":
       type: object
       allOf:
